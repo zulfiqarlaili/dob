@@ -11,7 +11,12 @@ export default function Home() {
   }, [value])
 
   function handleClicked() {
-    console.log(value)
+    const word_list = value.split('-')
+    const year = word_list[0]
+    const month = word_list[1]
+    const day = word_list[2]
+    const last_input = day+month+year
+    console.log(last_input)
   }
 
   return (
@@ -19,7 +24,6 @@ export default function Home() {
       css={{
         height: '100vh',
       }}>
-
       <Text h1 size={50} weight="bold"
         css={{
           textAlign: 'center',
@@ -28,47 +32,33 @@ export default function Home() {
           css={{
             textGradient: "45deg, $purple600 -20%, $pink600 100%",
           }}
-        >Numerology Numbers</Text>
+        >Numerology </Text>
+        Numbers
       </Text>
-
       <Text color='grey' size={17}
         css={{
           textAlign: 'center'
-        }}
-      >Discover the Fascinating Truths and Insights of Your Birthdate: Unveil the Hidden Meanings, Significance, and Impact on Your Life</Text>
-
+        }}>Discover the Fascinating Truths and Insights of Your Birthdate: Unveil the Hidden Meanings, Significance, and Impact on Your Life</Text>
       <Spacer y={4} />
-
       <Container wrap='wrap'>
-        <Text size={25} css={{ textAlign: 'center',fontWeight:'$bold' }} >Provide your birthdate</Text>
+        <Text size={25} css={{ textAlign: 'center', fontWeight: '$bold' }} >Provide your birthdate</Text>
 
         <Spacer y={0.5} />
-        <Input
-          bordered
-          type='date'
-          color='secondary'
-          value={value}
+        <Input bordered type='date' color='secondary' value={value} id='bday' aria-label='bday'
           onChange={e => { setValue(e.currentTarget.value); }}
-          id='bday'
-          aria-label='bday'
           css={{
             width: 'stretch',
-            textAlign:'center'
+            textAlign: 'center'
           }}
         />
-
         <Spacer y={0.6} />
-        <Button
-          disabled={!active}
-          color="gradient"
+        <Button disabled={!active} color="gradient" onPress={handleClicked}
           css={{
             width: 'stretch',
             linearGradient: "45deg, $purple600 -20%, $pink600 100%",
-          }}
-          onPress={handleClicked}>
-          Calculate Now
+          }}>
+          <Text color='white' b size={17}> Calculate Now </Text>
         </Button>
-
       </Container>
     </Container>
   )
