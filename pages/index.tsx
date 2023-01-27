@@ -1,4 +1,3 @@
-import styles from '@/styles/Home.module.css'
 import { Button, Container, Input, Spacer, Text } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 
@@ -16,18 +15,12 @@ export default function Home() {
   }
 
   return (
-    <Container
-      xs
-      display='flex'
-      alignContent='center'
+    <Container xs display='flex' alignContent='center'
       css={{
         height: '100vh',
       }}>
 
-      <Text
-        h1
-        size={50}
-        weight="bold"
+      <Text h1 size={50} weight="bold"
         css={{
           textAlign: 'center',
         }}>
@@ -38,9 +31,7 @@ export default function Home() {
         >Numerology Numbers</Text>
       </Text>
 
-      <Text
-        color='grey'
-        size={17}
+      <Text color='grey' size={17}
         css={{
           textAlign: 'center'
         }}
@@ -48,33 +39,31 @@ export default function Home() {
 
       <Spacer y={4} />
 
-      <Container >
-        <Text b size={25} css={{ textAlign: 'center' }} >Provide your birthdate</Text>
+      <Container wrap='wrap'>
+        <Text size={25} css={{ textAlign: 'center',fontWeight:'$bold' }} >Provide your birthdate</Text>
 
         <Spacer y={0.5} />
         <Input
           bordered
-          size='lg'
-          css={{
-            width: 'stretch',
-          }}
           type='date'
           color='secondary'
           value={value}
           onChange={e => { setValue(e.currentTarget.value); }}
           id='bday'
           aria-label='bday'
+          css={{
+            width: 'stretch',
+            textAlign:'center'
+          }}
         />
 
         <Spacer y={0.6} />
-
         <Button
-          size='lg'
           disabled={!active}
           color="gradient"
           css={{
             width: 'stretch',
-            linearGradient: "45deg, $purple600 -20%, $pink600 100%"
+            linearGradient: "45deg, $purple600 -20%, $pink600 100%",
           }}
           onPress={handleClicked}>
           Calculate Now
