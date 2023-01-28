@@ -1,30 +1,32 @@
 import { Button, Container, Input, Spacer, Text } from '@nextui-org/react';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
 
   const [value, setValue] = useState('');
   const [active, setActive] = useState(false)
+  const router = useRouter();
 
   useEffect(() => {
     setActive(value ? true : false);
   }, [value])
 
   function handleClicked() {
-    const word_list = value.split('-')
-    const year = word_list[0]
-    const month = word_list[1]
-    const day = word_list[2]
-    const last_input = day+month+year
-    console.log(last_input)
+    const [year, month, day] = value.split('-');
+    const last_input = `${day}${month}${year}`;
+    router.push({
+      pathname: '/result',
+      query: { dob: last_input }
+    })
   }
 
   return (
     <Container xs display='flex' alignContent='center'
       css={{
-        height: '100vh',
       }}>
-      <Text h1 size={50} weight="bold"
+      <Spacer y={8} />
+      <Text h1 size={42} weight="bold"
         css={{
           textAlign: 'center',
         }}>
@@ -60,6 +62,7 @@ export default function Home() {
           <Text color='white' b size={17}> Calculate Now </Text>
         </Button>
       </Container>
+      <Spacer y={3} />
     </Container>
   )
 }
