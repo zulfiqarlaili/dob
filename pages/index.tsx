@@ -1,5 +1,5 @@
 import StarComponent from '@/components/StarComponent';
-import { Button, Container, Input, Spacer, Text} from '@nextui-org/react';
+import { Button, Container, Input, Spacer, Text } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
@@ -62,9 +62,9 @@ export default function Home() {
           }}>
           <Text color='white' b size={17}> Calculate Now </Text>
         </Button>
+        <Spacer y={3}/>
+        {dob && <StarComponent dob={dob} />}
       </Container>
-      <Spacer y={3} />
-      {dob && <StarComponent dob={dob}/>}
     </Container>
   )
 }
