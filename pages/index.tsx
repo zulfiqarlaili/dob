@@ -1,12 +1,12 @@
-import { Button, Container, Input, Spacer, Text } from '@nextui-org/react';
-import { useRouter } from 'next/router';
+import StarComponent from '@/components/StarComponent';
+import { Button, Container, Input, Spacer, Text} from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
 
   const [value, setValue] = useState('');
+  const [dob, setDob] = useState('');
   const [active, setActive] = useState(false)
-  const router = useRouter();
 
   useEffect(() => {
     setActive(value ? true : false);
@@ -15,10 +15,11 @@ export default function Home() {
   function handleClicked() {
     const [year, month, day] = value.split('-');
     const last_input = `${day}${month}${year}`;
-    router.push({
-      pathname: '/result',
-      query: { dob: last_input }
-    })
+    setDob(last_input)
+    // router.push({
+    //   pathname: '/result',
+    //   query: { dob: last_input }
+    // })
   }
 
   return (
@@ -63,6 +64,7 @@ export default function Home() {
         </Button>
       </Container>
       <Spacer y={3} />
+      {dob && <StarComponent dob={dob}/>}
     </Container>
   )
 }
