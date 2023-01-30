@@ -6,14 +6,18 @@ export default function StarComponent(props: any) {
     const baseUrl = 'https://dob.just-type.com'
     const [image, setImage] = useState('');
 
+    const element = document.getElementById('bottom');
+
     useEffect(() => {
         fetch(baseUrl + '/result/' + props.dob)
             .then(response => response.blob())
             .then(blob => URL.createObjectURL(blob))
             .then(url => setImage(url))
-            .then(()=>router.push("/#StarComponent"))
+            .then(()=> {
+                if(element) element.scrollIntoView({ behavior: 'smooth' })
+            })
             .catch(error => alert(error));
-    }, [props.dob]);
+    }, [element, props.dob]);
 
     return (
         <div>

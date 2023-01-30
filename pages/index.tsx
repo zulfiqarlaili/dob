@@ -62,8 +62,14 @@ export default function Home() {
           }}>
           <Text color='white' b size={17}> Calculate Now </Text>
         </Button>
-        <Spacer y={3}/>
-        {dob && <StarComponent dob={dob} />}
+        <Spacer y={3} />
+        {dob && (
+          <>
+            <StarComponent dob={dob} />
+            <Spacer y={3}/>
+            <div id="bottom"/>
+          </>
+        )}
       </Container>
     </Container>
   )
