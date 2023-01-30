@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Image, Text } from '@nextui-org/react'
 
 export default function StarComponent(props: any) {
-    const baseUrl = 'http://localhost:8000'
+    const baseUrl = 'https://dob.just-type.com'
     const [image, setImage] = useState('');
 
     useEffect(() => {
