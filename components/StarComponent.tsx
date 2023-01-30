@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Image, Text } from '@nextui-org/react'
+import router from 'next/router';
 
 export default function StarComponent(props: any) {
     const baseUrl = 'https://dob.just-type.com'
@@ -10,6 +11,7 @@ export default function StarComponent(props: any) {
             .then(response => response.blob())
             .then(blob => URL.createObjectURL(blob))
             .then(url => setImage(url))
+            .then(()=>router.push("/#StarComponent"))
             .catch(error => alert(error));
     }, [props.dob]);
 
