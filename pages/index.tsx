@@ -1,6 +1,7 @@
 import StarComponent from '@/components/StarComponent';
 import { Button, Container, Input, Spacer, Text } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
+import { motion } from "framer-motion"
 
 export default function Home() {
 
@@ -26,48 +27,68 @@ export default function Home() {
     <Container xs display='flex' alignContent='center'
       css={{
       }}>
-      <Spacer y={8} />
-      <Text h1 size={42} weight="bold"
-        css={{
-          textAlign: 'center',
-        }}>
-        Explore the Significance of Your  <Text span
+      <motion.div
+        className="box"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Spacer y={8} />
+        <Text h1 size={42} weight="bold"
           css={{
-            textGradient: "45deg, $purple600 -20%, $pink600 100%",
-          }}
-        >Numerology </Text>
-        Numbers
-      </Text>
-      <Text color='grey' size={17}
-        css={{
-          textAlign: 'center'
-        }}>Discover the Fascinating Truths and Insights of Your Birthdate: Unveil the Hidden Meanings, Significance, and Impact on Your Life</Text>
+            textAlign: 'center',
+          }}>
+          Explore the Significance of Your
+          <Text span
+            css={{
+              textGradient: "45deg, $purple600 -20%, $pink600 100%",
+            }}
+          > Numerology </Text>
+          Numbers
+        </Text>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y:100 }}
+        animate={{ opacity: 1, y:0 }}
+        transition={{ duration: 0.5 }}>
+        <Text color='grey' size={17}
+          css={{
+            textAlign: 'center'
+          }}>Discover the Fascinating Truths and Insights of Your Birthdate: Unveil the Hidden Meanings, Significance, and Impact on Your Life</Text>
+      </motion.div>
       <Spacer y={4} />
       <Container wrap='wrap'>
-        <Text size={25} css={{ textAlign: 'center', fontWeight: '$bold' }} >Provide your birthdate</Text>
 
-        <Spacer y={0.5} />
-        <Input bordered type='date' color='secondary' value={value} id='bday' aria-label='bday'
-          onChange={e => { setValue(e.currentTarget.value); }}
-          css={{
-            width: 'stretch',
-            textAlign: 'center'
-          }}
-        />
-        <Spacer y={0.6} />
-        <Button disabled={!active} color="gradient" onPress={handleClicked}
-          css={{
-            width: 'stretch',
-            linearGradient: "45deg, $purple600 -20%, $pink600 100%",
-          }}>
-          <Text color='white' b size={17}> Calculate Now </Text>
-        </Button>
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}>
+
+          <Text size={25} css={{ textAlign: 'center', fontWeight: '$bold' }} >Provide your birthdate</Text>
+
+          <Spacer y={0.5} />
+          <Input bordered type='date' color='secondary' value={value} id='bday' aria-label='bday'
+            onChange={e => { setValue(e.currentTarget.value); }}
+            css={{
+              width: 'stretch',
+              textAlign: 'center'
+            }}
+          />
+          <Spacer y={0.6} />
+          <Button disabled={!active} color="gradient" onPress={handleClicked}
+            css={{
+              width: 'stretch',
+              linearGradient: "45deg, $purple600 -20%, $pink600 100%",
+            }}>
+            <Text color='white' b size={17}> Calculate Now </Text>
+          </Button>
+        </motion.div>
         <Spacer y={3} />
         {dob && (
           <>
             <StarComponent dob={dob} />
-            <Spacer y={3}/>
-            <div id="bottom"/>
+            <Spacer y={3} />
+            <div id="bottom" />
           </>
         )}
       </Container>
