@@ -9,6 +9,7 @@ export default function Home() {
   const [dob, setDob] = useState('');
   const [active, setActive] = useState(false)
 
+
   useEffect(() => {
     setActive(value ? true : false);
   }, [value])
@@ -48,8 +49,8 @@ export default function Home() {
         </Text>
       </motion.div>
       <motion.div
-        initial={{ opacity: 0, y:100 }}
-        animate={{ opacity: 1, y:0 }}
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}>
         <Text color='grey' size={17}
           css={{
