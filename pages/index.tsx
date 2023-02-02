@@ -1,7 +1,8 @@
-import StarComponent from '@/components/StarComponent';
+import Star from '@/components/Star';
 import { Button, Container, Input, Spacer, Text } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 import { motion } from "framer-motion"
+import Element from '@/components/Element';
 
 export default function Home() {
 
@@ -65,7 +66,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}>
 
-          <Text size={25} css={{ textAlign: 'center', fontWeight: '$bold' }} >Provide your birthdate</Text>
+          <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }} >Provide your birthdate</Text>
 
           <Spacer y={0.5} />
           <Input bordered type='date' color='secondary' value={value} id='bday' aria-label='bday'
@@ -87,12 +88,18 @@ export default function Home() {
         <Spacer y={3} />
         {dob && (
           <>
-            <StarComponent dob={dob} />
-            <Spacer y={3} />
             <div id="bottom" />
+            <Star dob={dob} />
+            <Spacer y={3} />
           </>
         )}
       </Container>
+      {dob && (
+        <>
+          <Element dob={dob} />
+          <Spacer y={3}/>
+        </>
+      )}
     </Container>
   )
 }

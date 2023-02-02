@@ -9,9 +9,9 @@ export default function DarkModeSwitch() {
         <div>
             {
                 isDark ?
-                    <MdLightMode size={30} onClick={() => { setTheme('light') }} />
+                    <MdLightMode size={20} onClick={() => { setTheme('light') }} />
                     :
-                    <MdNightlight size={30} onClick={() => { setTheme('dark') }} />
+                    <MdNightlight size={20} onClick={() => { setTheme('dark') }} />
             }
         </div>
     )

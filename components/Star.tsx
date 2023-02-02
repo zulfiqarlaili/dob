@@ -4,6 +4,7 @@ import router from 'next/router';
 
 export default function StarComponent(props: any) {
     const baseUrl = 'https://dob.just-type.com'
+    // const baseUrl = 'http://localhost:8000'
     const [image, setImage] = useState('');
 
     const element = document.getElementById('bottom');

@@ -45,7 +45,7 @@ export default function App({ Component, pageProps }: AppProps) {
                 fontWeight: '$bold'
               }} ><MdHome size={30}/></Link>
           </Navbar.Brand>
-          <Grid.Container justify='flex-end' alignItems='flex-start'>
+          <Grid.Container justify='flex-end' alignItems='flex-end'>
             <DarkModeSwitch />
             <Navbar.Toggle/>
           </Grid.Container>
