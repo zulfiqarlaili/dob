@@ -1,9 +1,12 @@
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
-import { Link, Navbar, NextUIProvider, createTheme, Container, Grid } from '@nextui-org/react';
+import { Link, Navbar, NextUIProvider, createTheme, Container, Grid, Divider, Text, Spacer } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import DarkModeSwitch from '@/components/DarkModeSwitch';
-import {MdHome} from 'react-icons/md'
+import { MdHome } from 'react-icons/md'
+import { ImTwitter } from 'react-icons/im'
+import { motion } from 'framer-motion';
+
 
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -43,11 +46,11 @@ export default function App({ Component, pageProps }: AppProps) {
             <Link color='inherit' href='/'
               css={{
                 fontWeight: '$bold'
-              }} ><MdHome size={30}/></Link>
+              }} ><MdHome size={30} /></Link>
           </Navbar.Brand>
           <Grid.Container justify='flex-end' alignItems='flex-end'>
             <DarkModeSwitch />
-            <Navbar.Toggle/>
+            <Navbar.Toggle />
           </Grid.Container>
           <Navbar.Collapse>
             {collapseItems.map((item, index) => (
@@ -68,6 +71,29 @@ export default function App({ Component, pageProps }: AppProps) {
           </Navbar.Collapse>
         </Navbar>
         <Component {...pageProps} />
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}>
+
+          <Divider />
+          <Spacer y={0.5}/>
+          <Container display='flex' justify='space-evenly' alignItems='center'>
+            <Grid css={{ display: 'flex' }}>
+              <Text size='$sm' weight='light'>Powered by</Text>
+              <Spacer x={0.2} />
+              <Text size='$sm' weight='extrabold'>OpenAI</Text>
+            </Grid>
+            <a href='https://twitter.com/SalemTheCats'>
+              <Grid css={{ display: 'flex', alignItems: 'center' }}>
+                <ImTwitter size={18} />
+                <Spacer x={0.2} />
+                <Text size='$sm' weight='light'>@SalemTheCats</Text>
+              </Grid>
+            </a>
+          </Container>
+          <Spacer y={4}/>
+        </motion.div>
       </NextUIProvider>
     </NextThemesProvider>
   )

@@ -1,4 +1,4 @@
-import { Card, Collapse, Container, Spacer, Text } from "@nextui-org/react";
+import { Card, Collapse, Container, Grid, Loading, Spacer, Text } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import AboutMe from "./AboutMe";
 
@@ -52,7 +52,6 @@ export default function Element(props: any) {
             });
 
             const result = await response.json();
-            console.log('get result')
             setAboutMe(result)
         } catch (error) {
             alert(error)
@@ -62,10 +61,15 @@ export default function Element(props: any) {
 
     return (
         <>
-            {aboutMe ? (<AboutMe aboutMe={aboutMe} />) : (<Container>
-                <Text size={25} css={{ textAlign: 'start', fontWeight: '$bold' }}>About You</Text>
-                <Text>AI Generating....</Text>
-            </Container>)}
+            {aboutMe ? (<AboutMe aboutMe={aboutMe} />) :
+                (<Container>
+                    <Text size={25} css={{ textAlign: 'start', fontWeight: '$bold' }}>About You</Text>
+                    <Grid css={{ display: 'flex', alignItems: 'center' }}>
+                        <Text>AI Generating</Text>
+                        <Spacer x={0.3}/>
+                        <Loading color='currentColor' type="points-opacity" />
+                    </Grid>
+                </Container>)}
             <Spacer y={1} />
             {(elements.length > 0) &&
                 (<>
