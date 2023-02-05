@@ -90,7 +90,7 @@ export default function Home() {
           <>
             <div id="bottom" />
             <Star dob={dob} />
-            <Spacer y={3} />
+            <Spacer y={1} />
           </>
         )}
       </Container>

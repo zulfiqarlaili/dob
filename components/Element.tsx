@@ -1,5 +1,6 @@
 import { Card, Collapse, Container, Spacer, Text } from "@nextui-org/react";
 import { useEffect, useState } from "react";
+import AboutMe from "./AboutMe";
 
 interface Element {
     name: string;
@@ -27,8 +28,15 @@ export default function Element(props: any) {
             .catch(error => alert(error));
     }, [dob]);
 
+    const aboutMeData = {
+        physical:'test',
+        ending:'test',
+    }
+
     return (
         <>
+        <AboutMe aboutMe={aboutMeData}/>
+        <Spacer y={1}/>
             {(elements.length > 0) &&
                 (<>
                     <Container>
