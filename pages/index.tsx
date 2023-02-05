@@ -1,5 +1,5 @@
 import Star from '@/components/Star';
-import { Button, Container, Input, Spacer, Text } from '@nextui-org/react';
+import { Button, Card, Container, Grid, Input, Spacer, Text } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 import { motion } from "framer-motion"
 import Element from '@/components/Element';
@@ -26,80 +26,131 @@ export default function Home() {
   }
 
   return (
-    <Container xs display='flex' alignContent='center'
-      css={{
-      }}>
-      <motion.div
-        className="box"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Spacer y={8} />
-        <Text h1 size={42} weight="bold"
-          css={{
-            textAlign: 'center',
-          }}>
-          Explore the Significance of Your
-          <Text span
+    <>
+      <Container xs display='flex' alignContent='center'
+        css={{
+        }}>
+        <motion.div
+          className="box"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Spacer y={8} />
+          <Text h1 size={42} weight="bold"
             css={{
-              textGradient: "45deg, $purple600 -20%, $pink600 100%",
-            }}
-          > Numerology </Text>
-          Numbers
-        </Text>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}>
-        <Text color='grey' size={17}
-          css={{
-            textAlign: 'center'
-          }}>Discover the Fascinating Truths and Insights of Your Birthdate: Unveil the Hidden Meanings, Significance, and Impact on Your Life</Text>
-      </motion.div>
-      <Spacer y={4} />
-      <Container wrap='wrap'>
-
+              textAlign: 'center',
+            }}>
+            Explore the Significance of Your
+            <Text span
+              css={{
+                textGradient: "45deg, $purple600 -20%, $pink600 100%",
+              }}
+            > Numerology </Text>
+            Numbers
+          </Text>
+        </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}>
-
-          <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }} >Provide your birthdate</Text>
-
-          <Spacer y={0.5} />
-          <Input bordered type='date' color='secondary' value={value} id='bday' aria-label='bday'
-            onChange={e => { setValue(e.currentTarget.value); }}
+          transition={{ duration: 0.5 }}>
+          <Text color='grey' size={17}
             css={{
-              width: 'stretch',
               textAlign: 'center'
-            }}
-          />
-          <Spacer y={0.6} />
-          <Button disabled={!active} color="gradient" onPress={handleClicked}
-            css={{
-              width: 'stretch',
-              linearGradient: "45deg, $purple600 -20%, $pink600 100%",
-            }}>
-            <Text color='white' b size={17}> Calculate Now </Text>
-          </Button>
+            }}>Discover the Fascinating Truths and Insights of Your Birthdate: Unveil the Hidden Meanings, Significance, and Impact on Your Life</Text>
         </motion.div>
-        <Spacer y={3} />
+        <Spacer y={4} />
+        <Container wrap='wrap'>
+
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}>
+
+            <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }} >Provide your birthdate</Text>
+
+            <Spacer y={0.5} />
+            <Input bordered type='date' color='secondary' value={value} id='bday' aria-label='bday'
+              onChange={e => { setValue(e.currentTarget.value); }}
+              css={{
+                width: 'stretch',
+                textAlign: 'center'
+              }}
+            />
+            <Spacer y={0.6} />
+            <Button disabled={!active} color="gradient" onPress={handleClicked}
+              css={{
+                width: 'stretch',
+                linearGradient: "45deg, $purple600 -20%, $pink600 100%",
+              }}>
+              <Text color='white' b size={17}> Calculate Now </Text>
+            </Button>
+          </motion.div>
+          <Spacer y={3} />
+
+
+          {dob && (
+            <>
+              <div id="bottom" />
+              <Star dob={dob} />
+              <Spacer y={1} />
+            </>
+          )}
+        </Container>
         {dob && (
           <>
-            <div id="bottom" />
-            <Star dob={dob} />
-            <Spacer y={1} />
+            <Element dob={dob} />
+            <Spacer y={3} />
           </>
         )}
       </Container>
-      {dob && (
-        <>
-          <Element dob={dob} />
-          <Spacer y={3}/>
-        </>
-      )}
-    </Container>
+      {dob ? (<></>) : (<>
+        <Spacer x={4} />
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}>
+          <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }} >Product Features</Text>
+          <Grid.Container gap={2} justify='center'>
+            <Grid lg={3} md={3} sm={3}>
+              <Card isHoverable >
+                <Card.Body>
+                  <Text weight='extrabold'>Antient Numerology</Text>
+                  <Spacer />
+                  <Text>Craft your personality, strengths, and challenges through a personalized numerology with Antient technology</Text>
+                </Card.Body>
+              </Card>
+            </Grid>
+            <Grid lg={3} md={3} sm={3}>
+              <Card isHoverable >
+                <Card.Body>
+                  <Text weight='extrabold'>Personalize Chart</Text>
+                  <Spacer />
+                  <Text>Personalize a diagram to exhibit your physical, spiritual, numerological and dominant element characteristics</Text>
+                </Card.Body>
+              </Card>
+            </Grid>
+            <Grid lg={3} md={3} sm={3}>
+              <Card isHoverable >
+                <Card.Body>
+                  <Text weight='extrabold'>Open AI</Text>
+                  <Spacer />
+                  <Text>Leverage the power of OpenAI library to generate a comprehensive depiction of yourself, incorporating factors such as your physical attributes and numerology, and utilizing a multitude of parameters to capture the intricacies of your individuality.</Text>
+                </Card.Body>
+              </Card>
+            </Grid>
+            <Grid lg={3} md={3} sm={3}>
+              <Card isHoverable >
+                <Card.Body>
+                  <Text weight='extrabold'>Dominance Element</Text>
+                  <Spacer />
+                  <Text>Determine your dominant element beforehand to gain insight into your strengths and weaknesses, receive relationship advice, and identify the key steps necessary to become the best version of yourself.</Text>
+                </Card.Body>
+              </Card>
+            </Grid>
+          </Grid.Container>
+        </motion.div>
+      </>)}
+    </>
   )
 }

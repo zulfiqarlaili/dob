@@ -52,7 +52,7 @@ export default function Element(props: any) {
             });
 
             const result = await response.json();
-            const additionalText = ' You can also bring the above diagram to metaphysician to get a deeper analysis.'
+            const additionalText = ' Additionally, you may consult with a metaphysician to obtain an in-depth analysis of above diagram.'
             setAboutMe(result+additionalText)
         } catch (error) {
             alert(error)
