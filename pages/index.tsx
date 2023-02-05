@@ -111,7 +111,24 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}>
           <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }} >Product Features</Text>
-          <Grid.Container gap={2} justify='center'>
+          <Grid.Container gap={2} justify='center' css={{
+            '@lg':{
+              paddingLeft:'7rem',
+              paddingRight:'7rem'
+            },
+            '@md':{
+              paddingLeft:'5rem',
+              paddingRight:'5rem'
+            },
+            '@sm':{
+              paddingLeft:'5rem',
+              paddingRight:'5rem'
+            },
+            '@xs':{
+              paddingLeft:'5rem',
+              paddingRight:'5rem'
+            },
+          }}>
             <Grid lg={3} md={3} sm={3}>
               <Card isHoverable >
                 <Card.Body>
