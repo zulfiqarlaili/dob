@@ -11,36 +11,66 @@ interface Element {
     advice: string;
 }
 
+interface IAboutMe {
+    physical: string;
+    ending: string;
+}
+
 
 export default function Element(props: any) {
     const baseUrl = 'https://dob.just-type.com'
     // const baseUrl = 'http://localhost:8000'
     const [elements, setElements] = useState([]);
+    const [aboutMe, setAboutMe] = useState('');
 
     const dob = props.dob;
     useEffect(() => {
         fetch(baseUrl + '/element/' + dob)
             .then(response => response.json())
             .then(json => {
-                console.log(json.elements)
+                setAboutMe('')
                 if (json.elements.length > 0) setElements(json.elements)
+                // setAboutMe(json.physical)
+                getAboutMe(json.physical, json.ending)
+
             })
             .catch(error => alert(error));
     }, [dob]);
 
-    const aboutMeData = {
-        physical:'test',
-        ending:'test',
+    async function getAboutMe(physical: string, ending: string) {
+        const data = {
+            physical: physical,
+            ending: ending,
+        };
+        try {
+            const response = await fetch(baseUrl + '/aboutMe/', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+            console.log('get result')
+            setAboutMe(result)
+        } catch (error) {
+            alert(error)
+        }
+
     }
 
     return (
         <>
-        <AboutMe aboutMe={aboutMeData}/>
-        <Spacer y={1}/>
+            {aboutMe ? (<AboutMe aboutMe={aboutMe} />) : (<Container>
+                <Text size={25} css={{ textAlign: 'start', fontWeight: '$bold' }}>About You</Text>
+                <Text>AI Generating....</Text>
+            </Container>)}
+            <Spacer y={1} />
             {(elements.length > 0) &&
                 (<>
                     <Container>
-                        <Text  size='$2xl' css={{ fontWeight: '$bold' }}>Element of Dominance</Text>
+                        <Text size='$2xl' css={{ fontWeight: '$bold' }}>Element of Dominance</Text>
                     </Container>
                     <Collapse.Group splitted>
                         {elements.map((element: Element, index: any) => {
