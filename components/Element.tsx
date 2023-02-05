@@ -52,7 +52,8 @@ export default function Element(props: any) {
             });
 
             const result = await response.json();
-            setAboutMe(result)
+            const additionalText = ' You can also bring the above diagram to metaphysician to get a deeper analysis.'
+            setAboutMe(result+additionalText)
         } catch (error) {
             alert(error)
         }

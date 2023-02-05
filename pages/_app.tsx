@@ -84,13 +84,13 @@ export default function App({ Component, pageProps }: AppProps) {
               <Spacer x={0.2} />
               <Text size='$sm' weight='extrabold'>OpenAI</Text>
             </Grid>
-            <a href='https://twitter.com/SalemTheCats'>
+            {/* <Link href='https://twitter.com/SalemTheCats'>
               <Grid css={{ display: 'flex', alignItems: 'center' }}>
                 <ImTwitter size={18} />
                 <Spacer x={0.2} />
-                <Text size='$sm' weight='light'>@SalemTheCats</Text>
+                <Text size='$sm'>@SalemTheCats</Text>
               </Grid>
-            </a>
+            </Link> */}
           </Container>
           <Spacer y={4}/>
         </motion.div>
