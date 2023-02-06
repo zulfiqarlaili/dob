@@ -28,7 +28,7 @@ export default function Element(props: any) {
         fetch(baseUrl + '/element/' + dob)
             .then(response => response.json())
             .then(json => {
-                setAboutMe('')
+                // setAboutMe('')
                 if (json.elements.length > 0) setElements(json.elements)
                 // setAboutMe(json.physical)
                 getAboutMe(json.physical, json.ending)
@@ -53,7 +53,7 @@ export default function Element(props: any) {
 
             const result = await response.json();
             const additionalText = ' Additionally, you may consult with a metaphysician to obtain an in-depth analysis of above diagram.'
-            setAboutMe(result+additionalText)
+            setAboutMe(result + additionalText)
         } catch (error) {
             alert(error)
         }
@@ -65,11 +65,13 @@ export default function Element(props: any) {
             {aboutMe ? (<AboutMe aboutMe={aboutMe} />) :
                 (<Container>
                     <Text size={25} css={{ textAlign: 'start', fontWeight: '$bold' }}>About You</Text>
-                    <Grid css={{ display: 'flex', alignItems: 'center' }}>
-                        <Text>AI Generating</Text>
-                        <Spacer x={0.3}/>
-                        <Loading color='currentColor' type="points-opacity" />
-                    </Grid>
+                    <Container css={{ display: 'flex',alignContent:'center',alignItems:'center',textAlign:'center', minHeight: '300px',minWidth:'200px'}}>
+                        <Container display='flex' direction='row' alignItems='baseline' justify='center'>
+                            <Text>AI Generating</Text>
+                            <Spacer x={0.3} />
+                            <Loading color='currentColor' type="points-opacity" />
+                        </Container>
+                    </Container>
                 </Container>)}
             <Spacer y={1} />
             {(elements.length > 0) &&
