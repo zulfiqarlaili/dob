@@ -112,25 +112,25 @@ export default function Home() {
           transition={{ duration: 1 }}>
           <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }} >Product Features</Text>
           <Grid.Container gap={2} justify='center' css={{
-            '@lg':{
-              paddingLeft:'7rem',
-              paddingRight:'7rem'
+            '@lg': {
+              paddingLeft: '7rem',
+              paddingRight: '7rem'
             },
-            '@md':{
-              paddingLeft:'5rem',
-              paddingRight:'5rem'
+            '@md': {
+              paddingLeft: '5rem',
+              paddingRight: '5rem'
             },
-            '@sm':{
-              paddingLeft:'5rem',
-              paddingRight:'5rem'
+            '@sm': {
+              paddingLeft: '5rem',
+              paddingRight: '5rem'
             },
-            '@xs':{
-              paddingLeft:'5rem',
-              paddingRight:'5rem'
+            '@xs': {
+              paddingLeft: '5rem',
+              paddingRight: '5rem'
             },
           }}>
             <Grid lg={3} md={3} sm={3}>
-              <Card isHoverable >
+              <Card variant="flat">
                 <Card.Body>
                   <Text weight='extrabold'>Antient Numerology</Text>
                   <Spacer />
@@ -139,7 +139,7 @@ export default function Home() {
               </Card>
             </Grid>
             <Grid lg={3} md={3} sm={3}>
-              <Card isHoverable >
+              <Card variant="flat">
                 <Card.Body>
                   <Text weight='extrabold'>Personalize Chart</Text>
                   <Spacer />
@@ -148,7 +148,7 @@ export default function Home() {
               </Card>
             </Grid>
             <Grid lg={3} md={3} sm={3}>
-              <Card isHoverable >
+              <Card variant="flat" >
                 <Card.Body>
                   <Text weight='extrabold'>Open AI</Text>
                   <Spacer />
@@ -157,7 +157,7 @@ export default function Home() {
               </Card>
             </Grid>
             <Grid lg={3} md={3} sm={3}>
-              <Card isHoverable >
+              <Card variant="flat">
                 <Card.Body>
                   <Text weight='extrabold'>Dominance Element</Text>
                   <Spacer />
