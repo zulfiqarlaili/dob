@@ -1,4 +1,4 @@
-import { Card, Collapse, Container, Grid, Loading, Spacer, Text } from "@nextui-org/react";
+import { Button, Card, Collapse, Container, Grid, Loading, Modal, Spacer, Text, useModal } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import AboutMe from "./AboutMe";
 
@@ -22,19 +22,30 @@ export default function Element(props: any) {
     // const baseUrl = 'http://localhost:8000'
     const [elements, setElements] = useState([]);
     const [aboutMe, setAboutMe] = useState('');
+    const [error, setError] = useState('');
+    const { setVisible, bindings } = useModal();
 
     const dob = props.dob;
     useEffect(() => {
         fetch(baseUrl + '/element/' + dob)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            })
             .then(json => {
-                // setAboutMe('')
+                setAboutMe('')
                 if (json.elements.length > 0) setElements(json.elements)
                 // setAboutMe(json.physical)
                 getAboutMe(json.physical, json.ending)
 
             })
-            .catch(error => alert(error));
+            .catch((error) => {
+                // alert(error)
+                setError(error.message)
+                setVisible(true)
+            });
     }, [dob]);
 
     async function getAboutMe(physical: string, ending: string) {
@@ -42,30 +53,52 @@ export default function Element(props: any) {
             physical: physical,
             ending: ending,
         };
-        try {
-            const response = await fetch(baseUrl + '/aboutMe/', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-
-            const result = await response.json();
+        const response = await fetch(baseUrl + '/aboutMe/', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+            return response.json();
+        }).then(json => {
+            const result = json
             const additionalText = ' Additionally, you may consult with a metaphysician to obtain an in-depth analysis of above diagram.'
             setAboutMe(result + additionalText)
-        } catch (error) {
-            alert(error)
-        }
+        }).catch((error) => {
+            // alert(error)
+            setError(error.message)
+            setVisible(true)
+        });;
 
     }
 
     return (
         <>
+            <Modal
+                scroll
+                width="400px"
+                aria-labelledby="modal-title"
+                aria-describedby="modal-description"
+                {...bindings}>
+                <Modal.Header>
+                    <Text id="modal-title" size={18} weight='extrabold' color="error">
+                        Error
+                    </Text>
+                </Modal.Header>
+                <Modal.Body>
+                    <Text id="modal-description">
+                        {error}
+                    </Text>
+                </Modal.Body>
+            </Modal>
             {aboutMe ? (<AboutMe aboutMe={aboutMe} />) :
                 (<Container>
                     <Text size={25} css={{ textAlign: 'start', fontWeight: '$bold' }}>About You</Text>
-                    <Container css={{ display: 'flex',alignContent:'center',alignItems:'center',textAlign:'center', minHeight: '300px',minWidth:'200px'}}>
+                    <Container css={{ display: 'flex', alignContent: 'center', alignItems: 'center', textAlign: 'center', minHeight: '300px', minWidth: '200px' }}>
                         <Container display='flex' direction='row' alignItems='baseline' justify='center'>
                             <Text>AI Generating</Text>
                             <Spacer x={0.3} />
