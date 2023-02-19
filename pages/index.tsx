@@ -109,9 +109,16 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}>
+          transition={{ duration: 1 }}
+          style={{
+            display:'flex',
+            flexDirection:'column',
+            alignItems:'center'
+          }}>
           <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }} >Product Features</Text>
+          <Spacer y={2} />
           <Grid.Container gap={2} justify='center' css={{
+            maxW: '70rem',
             '@lg': {
               paddingLeft: '7rem',
               paddingRight: '7rem'
@@ -130,40 +137,32 @@ export default function Home() {
             },
           }}>
             <Grid lg={3} md={3} sm={3}>
-              <Card variant="flat">
-                <Card.Body>
-                  <Text weight='extrabold'>Antient Numerology</Text>
-                  <Spacer />
-                  <Text>Craft your personality, strengths, and challenges through a personalized numerology with Antient technology</Text>
-                </Card.Body>
-              </Card>
+              <Container>
+                <Text weight='extrabold'>Antient Numerology</Text>
+                <Spacer />
+                <Text>Craft your personality, strengths, and challenges through a personalized numerology with <b>Antient</b> technology</Text>
+              </Container>
             </Grid>
             <Grid lg={3} md={3} sm={3}>
-              <Card variant="flat">
-                <Card.Body>
-                  <Text weight='extrabold'>Personalize Chart</Text>
-                  <Spacer />
-                  <Text>Personalize a diagram to exhibit your physical, spiritual, numerological and dominant element characteristics</Text>
-                </Card.Body>
-              </Card>
+              <Container>
+                <Text weight='extrabold'>Personalize Chart</Text>
+                <Spacer />
+                <Text>Personalize a diagram to exhibit your <b>physical</b>, <b>spiritual</b>, <b>numerological</b> and dominant element characteristics</Text>
+              </Container>
             </Grid>
             <Grid lg={3} md={3} sm={3}>
-              <Card variant="flat" >
-                <Card.Body>
-                  <Text weight='extrabold'>Open AI</Text>
-                  <Spacer />
-                  <Text>Leverage the power of OpenAI library to generate a comprehensive depiction of yourself, incorporating factors such as your physical attributes and numerology, and utilizing a multitude of parameters to capture the intricacies of your individuality.</Text>
-                </Card.Body>
-              </Card>
+              <Container>
+                <Text weight='extrabold'>Open AI</Text>
+                <Spacer />
+                <Text>Create a detailed representation of yourself using <b>OpenAI</b>, including physical attributes, numerology, and unique parameters..</Text>
+              </Container>
             </Grid>
             <Grid lg={3} md={3} sm={3}>
-              <Card variant="flat">
-                <Card.Body>
-                  <Text weight='extrabold'>Dominance Element</Text>
-                  <Spacer />
-                  <Text>Determine your dominant element beforehand to gain insight into your strengths and weaknesses, receive relationship advice, and identify the key steps necessary to become the best version of yourself.</Text>
-                </Card.Body>
-              </Card>
+              <Container>
+                <Text weight='extrabold'>Dominance Element</Text>
+                <Spacer />
+                <Text>Uncover your <b>dominant element</b> for valuable insights on strengths, weaknesses, relationships, and self-improvement steps.</Text>
+              </Container>
             </Grid>
           </Grid.Container>
         </motion.div>
