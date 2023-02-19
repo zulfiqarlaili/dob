@@ -96,7 +96,10 @@ export default function Element(props: any) {
                 </Modal.Body>
             </Modal>
             {aboutMe ? (<AboutMe aboutMe={aboutMe} />) :
-                (<Container>
+                (<Container css={{
+                    paddingLeft: '$0',
+                    paddingRight: '$0',
+                }}>
                     <Text size={25} css={{ textAlign: 'start', fontWeight: '$bold' }}>About You</Text>
                     <Container css={{ display: 'flex', alignContent: 'center', alignItems: 'center', textAlign: 'center', minHeight: '300px', minWidth: '200px' }}>
                         <Container display='flex' direction='row' alignItems='baseline' justify='center'>
@@ -109,10 +112,16 @@ export default function Element(props: any) {
             <Spacer y={1} />
             {(elements.length > 0) &&
                 (<>
-                    <Container>
+                    <Container css={{
+                    paddingLeft:'$0',
+                    paddingRight:'$0',
+                  }}>
                         <Text size='$2xl' css={{ fontWeight: '$bold' }}>Element of Dominance</Text>
                     </Container>
-                    <Collapse.Group splitted>
+                    <Collapse.Group splitted css={{
+                        paddingLeft: '$0',
+                        paddingRight: '$0',
+                    }}>
                         {elements.map((element: Element, index: any) => {
                             return (
                                 <Collapse

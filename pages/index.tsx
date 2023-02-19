@@ -28,7 +28,9 @@ export default function Home() {
   return (
     <>
       <Container css={{
-        height: dob ? '':'100vh'
+        height: dob ? '' : '100vh',
+        paddingLeft: '$0',
+        paddingRight: '$0',
       }}>
         <Container xs display='flex' alignContent='center'
           css={{
@@ -39,7 +41,11 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <Spacer y={8} />
+            <Spacer css={{
+              "@xs": {
+                paddingTop: '8rem'
+              }
+            }} />
             <Text h1 size={42} weight="bold"
               css={{
                 textAlign: 'center',
@@ -114,7 +120,7 @@ export default function Home() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
           }}>
           <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }} >Product Features</Text>
           <Spacer y={2} />
