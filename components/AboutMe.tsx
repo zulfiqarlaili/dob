@@ -6,7 +6,6 @@ export default function AboutMe(props: any) {
     const [fullText, setFullText] = useState(props.aboutMe)
     const [index, setIndex] = useState(0)
 
-    // setFullText('dfijhdfkjgbhdfolkjehd')
     useEffect(() => {
         if (index < fullText.length) {
             setTimeout(() => {

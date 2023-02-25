@@ -1,9 +1,10 @@
-import { Button, Card, Collapse, Container, Grid, Loading, Modal, Spacer, Text, useModal } from "@nextui-org/react";
+import { Button, Card, Collapse, Container, Grid, Loading, Modal, Spacer, Text, textWeights, useModal } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import AboutMe from "./AboutMe";
 
 interface Element {
     name: string;
+    color: string;
     personality: string;
     strength_and_weakness: string;
     relationship: string;
@@ -18,8 +19,8 @@ interface IAboutMe {
 
 
 export default function Element(props: any) {
-    const baseUrl = 'https://dob.just-type.com'
-    // const baseUrl = 'http://localhost:8000'
+    // const baseUrl = 'https://dob.just-type.com'
+    const baseUrl = 'http://localhost:8000'
     const [elements, setElements] = useState([]);
     const [aboutMe, setAboutMe] = useState('');
     const [error, setError] = useState('');
@@ -113,9 +114,9 @@ export default function Element(props: any) {
             {(elements.length > 0) &&
                 (<>
                     <Container css={{
-                    paddingLeft:'$0',
-                    paddingRight:'$0',
-                  }}>
+                        paddingLeft: '$0',
+                        paddingRight: '$0',
+                    }}>
                         <Text size='$2xl' css={{ fontWeight: '$bold' }}>Element of Dominance</Text>
                     </Container>
                     <Collapse.Group splitted css={{
@@ -127,7 +128,12 @@ export default function Element(props: any) {
                                 <Collapse
                                     key={index}
                                     shadow
-                                    title={element.name}
+                                    title={<Text
+                                        css={{
+                                            fontSize: '$2xl',
+                                            fontWeight: 'bold',
+                                            color: element.color
+                                        }}>{element.name}</Text>}
                                     subtitle={element.personality}>
                                     <Text h4 b>Strength & Weakness</Text>
                                     <Text i>{element.strength_and_weakness}</Text>
