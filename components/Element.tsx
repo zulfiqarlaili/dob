@@ -19,8 +19,8 @@ interface IAboutMe {
 
 
 export default function Element(props: any) {
-    // const baseUrl = 'https://dob.just-type.com'
-    const baseUrl = 'http://localhost:8000'
+    const baseUrl = 'https://dob.just-type.com'
+    // const baseUrl = 'http://localhost:8000'
     const [elements, setElements] = useState([]);
     const [aboutMe, setAboutMe] = useState('');
     const [error, setError] = useState('');
