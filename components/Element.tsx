@@ -128,6 +128,7 @@ export default function Element(props: any) {
                                 <Collapse
                                     expanded={true}
                                     disabled={true}
+                                    showArrow={false}
                                     key={index}
                                     shadow
                                     title={<Text

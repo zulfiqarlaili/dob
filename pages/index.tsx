@@ -1,5 +1,5 @@
 import Star from '@/components/Star';
-import { Button, Card, Container, Grid, Input, Spacer, Text } from '@nextui-org/react';
+import { Button, Card, Container, Grid, Input, Loading, Spacer, Text } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 import { motion } from "framer-motion"
 import Element from '@/components/Element';
@@ -9,6 +9,7 @@ export default function Home() {
   const [value, setValue] = useState('');
   const [dob, setDob] = useState('');
   const [active, setActive] = useState(false)
+  const [loading, setLoading] = useState(false)
 
 
   useEffect(() => {
@@ -23,6 +24,10 @@ export default function Home() {
     //   pathname: '/result',
     //   query: { dob: last_input }
     // })
+  }
+
+  const handleLoading = (loadingState:boolean) =>{
+    setLoading(loadingState)
   }
 
   return (
@@ -87,12 +92,12 @@ export default function Home() {
                 }}
               />
               <Spacer y={0.6} />
-              <Button disabled={!active} color="gradient" onPress={handleClicked}
+              <Button disabled={!active || loading} color="gradient" onPress={handleClicked}
                 css={{
                   width: 'stretch',
                   linearGradient: "45deg, $purple600 -20%, $pink600 100%",
-                }}>
-                <Text color='white' b size={17}> Calculate Now </Text>
+                }}>{loading ? <Loading type="points" color="currentColor" size="sm" />:<Text color='white' b size={17}> Calculate Now </Text>}
+                
               </Button>
             </motion.div>
             <Spacer y={3} />
@@ -101,7 +106,7 @@ export default function Home() {
             {dob && (
               <>
                 <div id="bottom" />
-                <Star dob={dob} />
+                <Star dob={dob} handleLoading={handleLoading} />
                 <Spacer y={1} />
               </>
             )}

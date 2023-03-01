@@ -10,14 +10,19 @@ export default function StarComponent(props: any) {
     const element = document.getElementById('bottom');
 
     useEffect(() => {
+        props.handleLoading(true)
         fetch(baseUrl + '/result/' + props.dob)
             .then(response => response.blob())
             .then(blob => URL.createObjectURL(blob))
             .then(url => setImage(url))
             .then(()=> {
+                props.handleLoading(false)
                 if(element) element.scrollIntoView({ behavior: 'smooth' })
             })
-            .catch(error => alert(error));
+            .catch((error:any) => {
+                alert(error)
+                props.handleLoading(false)
+            });
     }, [element, props.dob]);
 
     return (
