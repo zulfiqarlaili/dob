@@ -126,6 +126,8 @@ export default function Element(props: any) {
                         {elements.map((element: Element, index: any) => {
                             return (
                                 <Collapse
+                                    expanded={true}
+                                    disabled={true}
                                     key={index}
                                     shadow
                                     title={<Text
