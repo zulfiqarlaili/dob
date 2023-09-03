@@ -19,7 +19,7 @@ interface IAboutMe {
 
 
 export default function Element(props: any) {
-    const baseUrl = 'https://dob.just-type.com'
+    const baseUrl = 'https://www.borndate.duckdns.org'
     // const baseUrl = 'http://localhost:8000'
     const [elements, setElements] = useState([]);
     const [aboutMe, setAboutMe] = useState('');

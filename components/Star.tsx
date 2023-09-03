@@ -3,7 +3,7 @@ import { Image, Text } from '@nextui-org/react'
 import router from 'next/router';
 
 export default function StarComponent(props: any) {
-    const baseUrl = 'https://dob.just-type.com'
+    const baseUrl = 'https://www.borndate.duckdns.org'
     // const baseUrl = 'http://localhost:8000'
     const [image, setImage] = useState('');
 
