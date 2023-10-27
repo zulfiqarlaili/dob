@@ -19,6 +19,7 @@ interface IAboutMe {
 
 
 export default function Element(props: any) {
+    // Using firebase hard to handle .env
     const baseUrl = 'https://www.borndate.duckdns.org'
     // const baseUrl = 'http://localhost:8000'
     const [elements, setElements] = useState([]);
