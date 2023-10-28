@@ -1,6 +1,6 @@
 import { useTheme as useNextTheme } from 'next-themes';
 import { useTheme } from '@nextui-org/react';
-import { MdNightlight, MdLightMode } from 'react-icons/md';
+import { MdLightMode, MdNightlight } from 'react-icons/md';
 
 export default function DarkModeSwitch() {
   const { setTheme } = useNextTheme();

@@ -1,15 +1,15 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import {
+  Container,
+  Divider,
+  Grid,
   Link,
   Navbar,
   NextUIProvider,
-  createTheme,
-  Container,
-  Grid,
-  Divider,
-  Text,
   Spacer,
+  Text,
+  createTheme,
 } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import DarkModeSwitch from '@/components/DarkModeSwitch';

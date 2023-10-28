@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Text } from '@nextui-org/react';
 import router from 'next/router';
 

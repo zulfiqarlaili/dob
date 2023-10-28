@@ -1,5 +1,5 @@
 import { Container, Text } from '@nextui-org/react';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function AboutMe(props: any) {
   const [text, setText] = useState('');
