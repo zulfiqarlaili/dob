@@ -1,7 +1,6 @@
 import { Button, Card, Collapse, Container, Grid, Loading, Modal, Spacer, Text, textWeights, useModal } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import AboutMe from "./AboutMe";
-
 interface Element {
     name: string;
     color: string;
@@ -12,16 +11,9 @@ interface Element {
     advice: string;
 }
 
-interface IAboutMe {
-    physical: string;
-    ending: string;
-}
-
-
 export default function Element(props: any) {
-    // Using firebase hard to handle .env
-    const baseUrl = 'https://www.borndate.duckdns.org'
-    // const baseUrl = 'http://localhost:8000'
+    // Using firebase hosting cant handle .env
+    const baseUrl = 'https://www.borndate.duckdns.org' // use localhost:3000 for dev
     const [elements, setElements] = useState([]);
     const [aboutMe, setAboutMe] = useState('');
     const [error, setError] = useState('');
@@ -37,14 +29,13 @@ export default function Element(props: any) {
                 return response.json();
             })
             .then(json => {
-                setAboutMe('')
+                // setAboutMe('')
                 if (json.elements.length > 0) setElements(json.elements)
-                // setAboutMe(json.physical)
-                getAboutMe(json.physical, json.ending)
+                // TODO: Will resume implementation when OpenAI billing resolve
+                // getAboutMe(json.physical, json.ending)
 
             })
             .catch((error) => {
-                // alert(error)
                 setError(error.message)
                 setVisible(true)
             });
@@ -55,7 +46,7 @@ export default function Element(props: any) {
             physical: physical,
             ending: ending,
         };
-        const response = await fetch(baseUrl + '/aboutMe/', {
+        await fetch(baseUrl + '/aboutMe/', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -71,7 +62,6 @@ export default function Element(props: any) {
             const additionalText = ' Additionally, you may consult with a metaphysician to obtain an in-depth analysis of above diagram.'
             setAboutMe(result + additionalText)
         }).catch((error) => {
-            // alert(error)
             setError(error.message)
             setVisible(true)
         });;
@@ -97,7 +87,8 @@ export default function Element(props: any) {
                     </Text>
                 </Modal.Body>
             </Modal>
-            {aboutMe ? (<AboutMe aboutMe={aboutMe} />) :
+            {/* TODO: Will implement aboutMe Section when resolve OpenAI billing */}
+            {/* {aboutMe ? (<AboutMe aboutMe={aboutMe} />) :
                 (<Container css={{
                     paddingLeft: '$0',
                     paddingRight: '$0',
@@ -110,7 +101,7 @@ export default function Element(props: any) {
                             <Loading color='currentColor' type="points-opacity" />
                         </Container>
                     </Container>
-                </Container>)}
+                </Container>)} */}
             <Spacer y={1} />
             {(elements.length > 0) &&
                 (<>

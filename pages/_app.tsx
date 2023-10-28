@@ -4,14 +4,8 @@ import { Link, Navbar, NextUIProvider, createTheme, Container, Grid, Divider, Te
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import DarkModeSwitch from '@/components/DarkModeSwitch';
 import { MdHome } from 'react-icons/md'
-import { ImTwitter } from 'react-icons/im'
-import { motion } from 'framer-motion';
-
-
 
 export default function App({ Component, pageProps }: AppProps) {
-
-
   const lightTheme = createTheme({
     type: 'light',
     theme: {
@@ -71,24 +65,17 @@ export default function App({ Component, pageProps }: AppProps) {
           </Navbar.Collapse>
         </Navbar>
         <Component {...pageProps} />
-        <Spacer y={3}/>
-          <Divider />
-          <Spacer y={0.5}/>
-          <Container display='flex' justify='space-evenly' alignItems='center'>
-            <Grid css={{ display: 'flex' }}>
-              <Text size='$sm' weight='light'>Powered by</Text>
-              <Spacer x={0.2} />
-              <Text size='$sm' weight='extrabold'>OpenAI</Text>
-            </Grid>
-            {/* <Link href='https://twitter.com/SalemTheCats'>
-              <Grid css={{ display: 'flex', alignItems: 'center' }}>
-                <ImTwitter size={18} />
-                <Spacer x={0.2} />
-                <Text size='$sm'>@SalemTheCats</Text>
-              </Grid>
-            </Link> */}
-          </Container>
-          <Spacer y={4}/>
+        <Spacer y={3} />
+        <Divider />
+        <Spacer y={0.5} />
+        <Container display='flex' justify='space-evenly' alignItems='center'>
+          <Grid css={{ display: 'flex' }}>
+            <Text size='$sm' weight='light'>Powered by</Text>
+            <Spacer x={0.2} />
+            <Text size='$sm' weight='extrabold'>OpenAI</Text>
+          </Grid>
+        </Container>
+        <Spacer y={4} />
       </NextUIProvider>
     </NextThemesProvider>
   )
