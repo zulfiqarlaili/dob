@@ -1,46 +1,65 @@
-import '@/styles/globals.css'
-import type { AppProps } from 'next/app'
-import { Link, Navbar, NextUIProvider, createTheme, Container, Grid, Divider, Text, Spacer } from '@nextui-org/react';
+import '@/styles/globals.css';
+import type { AppProps } from 'next/app';
+import {
+  Link,
+  Navbar,
+  NextUIProvider,
+  createTheme,
+  Container,
+  Grid,
+  Divider,
+  Text,
+  Spacer,
+} from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import DarkModeSwitch from '@/components/DarkModeSwitch';
-import { MdHome } from 'react-icons/md'
+import { MdHome } from 'react-icons/md';
 
 export default function App({ Component, pageProps }: AppProps) {
   const lightTheme = createTheme({
     type: 'light',
-    theme: {
-    }
-  })
+    theme: {},
+  });
 
   const darkTheme = createTheme({
     type: 'dark',
-    theme: {
-    }
-  })
+    theme: {},
+  });
 
   const collapseItems = [
-    "Element (coming soon)",
-    "Physical (coming soon)",
-    "Spiritual (coming soon)",
-    "Combination (coming soon)",
+    'Element (coming soon)',
+    'Physical (coming soon)',
+    'Spiritual (coming soon)',
+    'Combination (coming soon)',
   ];
 
   return (
     <NextThemesProvider
-      defaultTheme="system"
-      attribute="class"
+      defaultTheme='system'
+      attribute='class'
       value={{
         light: lightTheme.className,
-        dark: darkTheme.className
+        dark: darkTheme.className,
       }}
     >
       <NextUIProvider>
-        <Navbar variant='static' isCompact shouldHideOnScroll disableShadow disableScrollHandler>
+        <Navbar
+          variant='static'
+          isCompact
+          shouldHideOnScroll
+          disableShadow
+          disableScrollHandler
+        >
           <Navbar.Brand>
-            <Link color='inherit' href='/'
+            <Link
+              color='inherit'
+              href='/'
               css={{
-                fontWeight: '$bold'
-              }} ><MdHome size={30} /></Link>
+                fontWeight: '$bold',
+              }}
+            >
+              <MdHome size={30} />
+            </Link>
           </Navbar.Brand>
           <Grid.Container justify='flex-end' alignItems='flex-end'>
             <DarkModeSwitch />
@@ -53,11 +72,12 @@ export default function App({ Component, pageProps }: AppProps) {
                   css={{
                     display: 'flex',
                     justifyContent: 'end',
-                    minWidth: "100%",
+                    minWidth: '100%',
                     cursor: 'not-allowed',
-                    color: 'Grey'
+                    color: 'Grey',
                   }}
-                  href="#">
+                  href='#'
+                >
                   {item}
                 </Link>
               </Navbar.CollapseItem>
@@ -70,13 +90,17 @@ export default function App({ Component, pageProps }: AppProps) {
         <Spacer y={0.5} />
         <Container display='flex' justify='space-evenly' alignItems='center'>
           <Grid css={{ display: 'flex' }}>
-            <Text size='$sm' weight='light'>Powered by</Text>
+            <Text size='$sm' weight='light'>
+              Powered by
+            </Text>
             <Spacer x={0.2} />
-            <Text size='$sm' weight='extrabold'>OpenAI</Text>
+            <Text size='$sm' weight='extrabold'>
+              OpenAI
+            </Text>
           </Grid>
         </Container>
         <Spacer y={4} />
       </NextUIProvider>
     </NextThemesProvider>
-  )
+  );
 }
