@@ -20,7 +20,8 @@ interface Element {
 
 export default function Element(props: any) {
   // Using firebase hosting cant handle .env
-  const baseUrl = 'https://www.borndate.duckdns.org'; // use localhost:3000 for dev
+  const baseUrl = 'https://borndate.07102020.xyz';
+  // const baseUrl = 'http://localhost:8000'
   const [elements, setElements] = useState([]);
   const [aboutMe, setAboutMe] = useState('');
   const [error, setError] = useState('');
