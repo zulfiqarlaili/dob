@@ -1,7 +1,6 @@
 import Star from '@/components/Star';
 import {
   Button,
-  Card,
   Container,
   Grid,
   Input,
@@ -117,9 +116,9 @@ export default function Home() {
               <Spacer y={0.5} />
               <Input
                 bordered
+                label="Date"
                 type='date'
                 color='secondary'
-                value={value}
                 id='bday'
                 aria-label='bday'
                 onChange={(e) => {
