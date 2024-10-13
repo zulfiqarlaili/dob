@@ -1,6 +1,7 @@
 import Star from '@/components/Star';
 import {
   Button,
+  Card,
   Container,
   Grid,
   Input,
@@ -19,7 +20,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setActive(value ? true : false);
+    //setActive(value ? true : false);
+    if (value.length === 10) {
+      setActive(true);
+    } else {
+      setDob('');
+      setActive(false);
+    }
   }, [value]);
 
   function handleClicked() {
@@ -34,6 +41,52 @@ export default function Home() {
 
   const handleLoading = (loadingState: boolean) => {
     setLoading(loadingState);
+  };
+
+  const handleChange = (e: any) => {
+    let inputValue = e.currentTarget.value.replace(/\D/g, ""); // Remove non-numeric characters first
+
+    // Only add dashes if typing (not if deleting)
+    if (inputValue.length >= 2 ) {
+      inputValue = inputValue.slice(0, 2) + "-" + inputValue.slice(2);
+    }
+    if (inputValue.length >= 5 ) {
+      inputValue = inputValue.slice(0, 5) + "-" + inputValue.slice(5, 9);
+    }
+
+    // Validate month part (mm must be between 01 and 12)
+    if (inputValue.length >= 5) {
+      const month = parseInt(inputValue.slice(3, 5), 10); // Extract the month
+      if (month < 1 || month > 12) {
+        // If the month is invalid, remove the month and dash (revert to only `dd-`)
+        inputValue = inputValue.slice(0, 2) + "-"; // Keep `dd-` format, remove month
+      }
+    }
+
+    // Validate day part (dd must be between 01 and 31)
+    if (inputValue.length >= 2) {
+      const day = parseInt(inputValue.slice(0, 2), 10); // Extract the day
+      if (day < 1 || day > 31) {
+        // If the day is invalid, remove the day and dash (revert to only `-mm-`)
+        inputValue = inputValue.slice(2); // Remove `dd-` part, keep `mm-` format
+      }
+    }
+
+    // Validate year part (yyyy must be between 1900 and 2100)
+    if (inputValue.length >= 10) {
+      const year = parseInt(inputValue.slice(6, 10), 10); // Extract the year
+      if (year < 1900 || year > 2100) {
+        // If the year is invalid, remove the year and dash (revert to only `dd-mm-`)
+        inputValue = inputValue.slice(0, 5); // Keep `dd-mm-` format, remove year
+      }
+    }
+
+    // imit to 10 characters (dd-mm-yyyy format)
+    if (inputValue.length > 10) {
+      inputValue = inputValue.slice(0, 10);
+    }
+
+    setValue(inputValue);
   };
 
   return (
@@ -115,19 +168,21 @@ export default function Home() {
 
               <Spacer y={0.5} />
               <Input
+                clearable
                 bordered
-                label="Date"
-                type='date'
-                color='secondary'
-                id='bday'
-                aria-label='bday'
-                onChange={(e) => {
-                  setValue(e.currentTarget.value);
-                }}
+                color="secondary"
+                id="bday"
+                aria-label="bday"
+                value={value} // Use the existing value
+                onChange={handleChange} // Automatically format dashes
                 css={{
-                  width: 'stretch',
-                  textAlign: 'center',
+                  width: "stretch",
+                  textAlign: "center",
                 }}
+                placeholder="dd-mm-yyyy"
+                maxLength={10} // Ensure only 10 characters can be entered
+                inputMode="numeric"  // Brings up the numeric keyboard on mobile
+                pattern="\d*" // Allows only digits (optional, but helps ensure numeric input)
               />
               <Spacer y={0.6} />
               <Button
