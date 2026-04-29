@@ -1,314 +1,258 @@
-import Star from '@/components/Star';
+import BirthDateFields from '@/components/BirthDateFields';
+import CompatibilityChecker from '@/components/CompatibilityChecker';
+import ResultExperience from '@/components/ResultExperience';
+import { DateParts, displayDob, dobToDateParts, parseDateParts } from '@/lib/dob';
+import { SavedReading, getSavedReadings } from '@/lib/storage';
 import {
   Button,
   Card,
+  Collapse,
   Container,
   Grid,
-  Input,
-  Loading,
   Spacer,
   Text,
 } from '@nextui-org/react';
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import Element from '@/components/Element';
+import { FormEvent, MouseEvent, useEffect, useState } from 'react';
+import { MdCompareArrows, MdHistory, MdStars } from 'react-icons/md';
 
 export default function Home() {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState<DateParts>({ day: '', month: '', year: '' });
   const [dob, setDob] = useState('');
-  const [active, setActive] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [readings, setReadings] = useState<SavedReading[]>([]);
+  const [showCompatibility, setShowCompatibility] = useState(false);
 
   useEffect(() => {
-    //setActive(value ? true : false);
-    if (value.length === 10) {
-      setActive(true);
-    } else {
-      setDob('');
-      setActive(false);
-    }
-  }, [value]);
+    setReadings(getSavedReadings());
+  }, []);
 
-  function handleClicked() {
-    const [year, month, day] = value.split('-');
-    const last_input = `${day}${month}${year}`;
-    setDob(last_input);
-    // router.push({
-    //   pathname: '/result',
-    //   query: { dob: last_input }
-    // })
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const queryValue = {
+      day: String(params.get('birth-day') || '').replace(/\D/g, '').slice(0, 2),
+      month: String(params.get('birth-month') || '').replace(/\D/g, '').slice(0, 2),
+      year: String(params.get('birth-year') || '').replace(/\D/g, '').slice(0, 4),
+    };
+
+    if (!queryValue.day && !queryValue.month && !queryValue.year) return;
+
+    setValue(queryValue);
+    const parsed = parseDateParts(queryValue);
+    if (parsed.error) {
+      setError(parsed.error);
+      setDob('');
+    } else {
+      setError('');
+      setDob(parsed.dob);
+    }
+    window.history.replaceState(null, '', window.location.pathname);
+  }, []);
+
+  function getDatePartsFromForm(form: HTMLFormElement): DateParts {
+    const data = new FormData(form);
+    return {
+      day: String(data.get('birth-day') || '').replace(/\D/g, '').slice(0, 2),
+      month: String(data.get('birth-month') || '').replace(/\D/g, '').slice(0, 2),
+      year: String(data.get('birth-year') || '').replace(/\D/g, '').slice(0, 4),
+    };
   }
 
-  const handleLoading = (loadingState: boolean) => {
-    setLoading(loadingState);
-  };
-
-  const handleChange = (e: any) => {
-    let inputValue = e.currentTarget.value.replace(/\D/g, ""); // Remove non-numeric characters first
-
-    // Only add dashes if typing (not if deleting)
-    if (inputValue.length >= 2 ) {
-      inputValue = inputValue.slice(0, 2) + "-" + inputValue.slice(2);
-    }
-    if (inputValue.length >= 5 ) {
-      inputValue = inputValue.slice(0, 5) + "-" + inputValue.slice(5, 9);
+  function handleCalculate(nextValue: DateParts = value) {
+    const parsed = parseDateParts(nextValue);
+    if (parsed.error) {
+      setError(parsed.error);
+      setDob('');
+      return;
     }
 
-    // Validate month part (mm must be between 01 and 12)
-    if (inputValue.length >= 5) {
-      const month = parseInt(inputValue.slice(3, 5), 10); // Extract the month
-      if (month < 1 || month > 12) {
-        // If the month is invalid, remove the month and dash (revert to only `dd-`)
-        inputValue = inputValue.slice(0, 2) + "-"; // Keep `dd-` format, remove month
-      }
-    }
+    setError('');
+    setDob(parsed.dob);
+  }
 
-    // Validate day part (dd must be between 01 and 31)
-    if (inputValue.length >= 2) {
-      const day = parseInt(inputValue.slice(0, 2), 10); // Extract the day
-      if (day < 1 || day > 31) {
-        // If the day is invalid, remove the day and dash (revert to only `-mm-`)
-        inputValue = inputValue.slice(2); // Remove `dd-` part, keep `mm-` format
-      }
-    }
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextValue = getDatePartsFromForm(event.currentTarget);
+    setValue(nextValue);
+    handleCalculate(nextValue);
+  }
 
-    // Validate year part (yyyy must be between 1900 and 2100)
-    if (inputValue.length >= 10) {
-      const year = parseInt(inputValue.slice(6, 10), 10); // Extract the year
-      if (year < 1900 || year > 2100) {
-        // If the year is invalid, remove the year and dash (revert to only `dd-mm-`)
-        inputValue = inputValue.slice(0, 5); // Keep `dd-mm-` format, remove year
-      }
-    }
+  function handleButtonClick(event: MouseEvent<HTMLButtonElement>) {
+    const form = event.currentTarget.form;
+    if (!form) return;
+    const nextValue = getDatePartsFromForm(form);
+    setValue(nextValue);
+    handleCalculate(nextValue);
+  }
 
-    // imit to 10 characters (dd-mm-yyyy format)
-    if (inputValue.length > 10) {
-      inputValue = inputValue.slice(0, 10);
-    }
-
-    setValue(inputValue);
-  };
+  function openReading(savedDob: string) {
+    setValue(dobToDateParts(savedDob));
+    setDob(savedDob);
+    setError('');
+  }
 
   return (
     <>
-      <Container
-        css={{
-          height: dob ? '' : '100vh',
-          paddingLeft: '$0',
-          paddingRight: '$0',
-        }}
-      >
+      <Container css={{ minHeight: dob ? 'auto' : '100vh', paddingLeft: '$0', paddingRight: '$0' }}>
         <Container xs display='flex' alignContent='center' css={{}}>
-          <motion.div
-            className='box'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+          <div
+            style={{
+              alignItems: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+            }}
           >
-            <Spacer
-              css={{
-                '@xs': {
-                  paddingTop: '8rem',
-                },
-              }}
-            />
+            <Spacer css={{ '@xs': { paddingTop: '6rem' } }} />
             <Text
               h1
               size={42}
               weight='bold'
-              css={{
-                textAlign: 'center',
-              }}
+              css={{ textAlign: 'center', maxW: '780px' }}
             >
-              Explore the Significance of Your
+              Get Your
               <Text
                 span
-                css={{
-                  textGradient: '45deg, $purple600 -20%, $pink600 100%',
-                }}
+                css={{ textGradient: '45deg, $purple600 -20%, $pink600 100%' }}
               >
                 {' '}
-                Numerology{' '}
+                Birthdate Reading
               </Text>
-              Numbers
             </Text>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Text
-              color='grey'
-              size={17}
-              css={{
-                textAlign: 'center',
-              }}
-            >
-              Discover the Fascinating Truths and Insights of Your Birthdate:
-              Unveil the Hidden Meanings, Significance, and Impact on Your Life
+            <Text color='gray' size={17} css={{ textAlign: 'center', maxW: '620px' }}>
+              Pick your date. See your chart, element, and one practical step.
             </Text>
-          </motion.div>
-          <Spacer y={4} />
-          <Container wrap='wrap'>
-            <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-            >
-              <Text
-                size='$2xl'
-                css={{
-                  textAlign: 'center',
-                  fontWeight: '$bold',
-                }}
-              >
-                Provide your birthdate
-              </Text>
+          </div>
 
-              <Spacer y={0.5} />
-              <Input
-                clearable
-                bordered
-                color="secondary"
-                id="bday"
-                aria-label="bday"
-                value={value} // Use the existing value
-                onChange={handleChange} // Automatically format dashes
-                css={{
-                  width: "stretch",
-                  textAlign: "center",
-                }}
-                placeholder="dd-mm-yyyy"
-                maxLength={10} // Ensure only 10 characters can be entered
-                inputMode="numeric"  // Brings up the numeric keyboard on mobile
-                pattern="\d*" // Allows only digits (optional, but helps ensure numeric input)
-              />
-              <Spacer y={0.6} />
-              <Button
-                disabled={!active || loading}
-                color='gradient'
-                onPress={handleClicked}
-                css={{
-                  width: 'stretch',
-                  linearGradient: '45deg, $purple600 -20%, $pink600 100%',
-                }}
-              >
-                {loading ? (
-                  <Loading type='points' color='currentColor' size='sm' />
-                ) : (
-                  <Text color='white' b size={17}>
-                    {' '}
-                    Calculate Now{' '}
+          <Spacer y={3} />
+          <Container wrap='wrap'>
+            <div>
+              <Card variant='bordered'>
+                <Card.Body>
+                  <Text
+                    size='$2xl'
+                    css={{ textAlign: 'center', fontWeight: '$bold' }}
+                  >
+                    Start with your birth date
                   </Text>
-                )}
-              </Button>
-            </motion.div>
-            <Spacer y={3} />
+                  <Text color='gray' css={{ textAlign: 'center' }}>
+                    No signup. Your reading is saved only on this device.
+                  </Text>
+                  <Spacer y={1} />
+                  <form onSubmit={handleSubmit} noValidate>
+                    <BirthDateFields
+                      namePrefix='birth'
+                      value={value}
+                      onChange={(nextValue) => {
+                        setValue(nextValue);
+                        setError('');
+                      }}
+                    />
+                    {error && (
+                      <>
+                        <Spacer y={0.5} />
+                        <Text color='error' size='$sm'>
+                          {error}
+                        </Text>
+                      </>
+                    )}
+                    <Spacer y={0.8} />
+                    <button
+                      className='primary-action-button'
+                      type='button'
+                      onClick={handleButtonClick}
+                    >
+                      <MdStars />
+                      Get My Reading
+                    </button>
+                  </form>
+                </Card.Body>
+              </Card>
+            </div>
+
+            {!dob && readings.length > 0 && (
+              <>
+                <Spacer y={1} />
+                <Grid.Container gap={1} justify='center'>
+                  <Grid>
+                    <Button
+                      auto
+                      light
+                      color='secondary'
+                      icon={<MdHistory />}
+                      onPress={() => openReading(readings[0].dob)}
+                    >
+                      Continue {displayDob(readings[0].dob)}
+                    </Button>
+                  </Grid>
+                </Grid.Container>
+              </>
+            )}
 
             {dob && (
               <>
-                <div id='bottom' />
-                <Star dob={dob} handleLoading={handleLoading} />
+                <ResultExperience dob={dob} onSaved={setReadings} />
+                <Spacer y={2} />
+              </>
+            )}
+
+            <Spacer y={1} />
+            <Grid.Container gap={1} justify='center'>
+              <Grid>
+                <Button
+                  auto
+                  light={!showCompatibility}
+                  color='secondary'
+                  icon={<MdCompareArrows />}
+                  onPress={() => setShowCompatibility(!showCompatibility)}
+                >
+                  Compare Two Birthdates
+                </Button>
+              </Grid>
+            </Grid.Container>
+            {showCompatibility && (
+              <>
                 <Spacer y={1} />
+                <CompatibilityChecker />
               </>
             )}
           </Container>
-          {dob && (
-            <>
-              <Element dob={dob} />
-              <Spacer y={3} />
-            </>
-          )}
         </Container>
       </Container>
-      {dob ? (
-        <></>
-      ) : (
-        <>
-          <Spacer x={4} />
-          <motion.div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Text
-              size='$2xl'
-              css={{ textAlign: 'center', fontWeight: '$bold' }}
-            >
-              Product Features
-            </Text>
-            <Spacer y={2} />
-            <Grid.Container
-              gap={2}
-              justify='center'
-              css={{
-                maxW: '70rem',
-                '@lg': {
-                  paddingLeft: '7rem',
-                  paddingRight: '7rem',
-                },
-                '@md': {
-                  paddingLeft: '5rem',
-                  paddingRight: '5rem',
-                },
-                '@sm': {
-                  paddingLeft: '5rem',
-                  paddingRight: '5rem',
-                },
-                '@xs': {
-                  paddingLeft: '5rem',
-                  paddingRight: '5rem',
-                },
-              }}
-            >
-              <Grid lg={3} md={3} sm={3}>
-                <Container>
-                  <Text weight='extrabold'>Antient Numerology</Text>
-                  <Spacer />
-                  <Text>
-                    Craft your personality, strengths, and challenges through a
-                    personalized numerology with <b>Antient</b> technology
-                  </Text>
-                </Container>
-              </Grid>
-              <Grid lg={3} md={3} sm={3}>
-                <Container>
-                  <Text weight='extrabold'>Personalize Chart</Text>
-                  <Spacer />
-                  <Text>
-                    Personalize a diagram to exhibit your <b>physical</b>,{' '}
-                    <b>spiritual</b>, <b>numerological</b> and dominant element
-                    characteristics
-                  </Text>
-                </Container>
-              </Grid>
-              <Grid lg={3} md={3} sm={3}>
-                <Container>
-                  <Text weight='extrabold'>Open AI</Text>
-                  <Spacer />
-                  <Text>
-                    Create a detailed representation of yourself using{' '}
-                    <b>OpenAI</b>, including physical attributes, numerology,
-                    and unique parameters..
-                  </Text>
-                </Container>
-              </Grid>
-              <Grid lg={3} md={3} sm={3}>
-                <Container>
-                  <Text weight='extrabold'>Dominance Element</Text>
-                  <Spacer />
-                  <Text>
-                    Uncover your <b></b> for valuable insights on strengths,
-                    weaknesses, relationships, and self-improvement steps.
-                  </Text>
-                </Container>
-              </Grid>
-            </Grid.Container>
-          </motion.div>
-        </>
+
+      {!dob && (
+        <Container xs>
+          <Spacer y={2} />
+          <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }}>
+            What You Get
+          </Text>
+          <Text color='gray' css={{ textAlign: 'center' }}>
+            Simple result first. Details are available when you want them.
+          </Text>
+          <Spacer y={1} />
+          <Collapse.Group splitted>
+            <Collapse title='Your chart and element' subtitle='A visual numerology chart with your dominant element.'>
+              <Text>
+                Your reading starts with the chart image, then explains your strongest
+                element in plain language.
+              </Text>
+            </Collapse>
+            <Collapse title='Personal reading' subtitle='Spirit, physical, and ending numbers summarized.'>
+              <Text>
+                The reading turns your core numbers into a short profile, practical
+                strengths, and a useful next step.
+              </Text>
+            </Collapse>
+            <Collapse title='Save, share, and compare' subtitle='Optional tools after the main reading.'>
+              <Text>
+                Save recent readings on this device, copy a private result link, download
+                a result card, or compare two birthdates.
+              </Text>
+            </Collapse>
+          </Collapse.Group>
+          <Spacer y={2} />
+        </Container>
       )}
     </>
   );

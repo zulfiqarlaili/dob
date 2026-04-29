@@ -27,13 +27,6 @@ export default function App({ Component, pageProps }: AppProps) {
     theme: {},
   });
 
-  const collapseItems = [
-    'Element (coming soon)',
-    'Physical (coming soon)',
-    'Spiritual (coming soon)',
-    'Combination (coming soon)',
-  ];
-
   return (
     <>
       <Script
@@ -67,30 +60,13 @@ export default function App({ Component, pageProps }: AppProps) {
                 }}
               >
                 <MdHome size={30} />
+                <Spacer x={0.4} />
+                <Text b>BornDate</Text>
               </Link>
             </Navbar.Brand>
             <Grid.Container justify='flex-end' alignItems='flex-end'>
               <DarkModeSwitch />
-              <Navbar.Toggle />
             </Grid.Container>
-            <Navbar.Collapse>
-              {collapseItems.map((item, index) => (
-                <Navbar.CollapseItem key={item}>
-                  <Link
-                    css={{
-                      display: 'flex',
-                      justifyContent: 'end',
-                      minWidth: '100%',
-                      cursor: 'not-allowed',
-                      color: 'Grey',
-                    }}
-                    href='#'
-                  >
-                    {item}
-                  </Link>
-                </Navbar.CollapseItem>
-              ))}
-            </Navbar.Collapse>
           </Navbar>
           <Component {...pageProps} />
           <Spacer y={3} />
@@ -103,7 +79,7 @@ export default function App({ Component, pageProps }: AppProps) {
               </Text>
               <Spacer x={0.2} />
               <Text size='$sm' weight='extrabold'>
-                OpenAI
+                Structured Numerology
               </Text>
             </Grid>
           </Container>

@@ -1,0 +1,38 @@
+.birth-date-fields {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.primary-action-button {
+  align-items: center;
+  background: linear-gradient(45deg, #7828c8 -20%, #ff4ecd 100%);
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  gap: 10px;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 18px;
+  width: 100%;
+}
+
+.primary-action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.primary-action-button svg {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 560px) {
+  .birth-date-fields {
+    grid-template-columns: 1fr;
+  }
+}
