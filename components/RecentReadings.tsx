@@ -1,7 +1,7 @@
-import { Button, Card, Grid, Spacer, Text } from '@nextui-org/react';
-import { MdDeleteOutline, MdOpenInNew } from 'react-icons/md';
 import { displayDob } from '@/lib/dob';
 import { SavedReading, deleteSavedReading } from '@/lib/storage';
+import { MdDeleteOutline } from 'react-icons/md';
+import ElementBadge from './ElementBadge';
 
 type RecentReadingsProps = {
   readings: SavedReading[];
@@ -13,52 +13,55 @@ export default function RecentReadings({ readings, onOpen, onChange }: RecentRea
   if (readings.length === 0) return null;
 
   return (
-    <>
-      <Text h3 size={26} css={{ textAlign: 'center' }}>
-        Recent readings
-      </Text>
-      <Spacer y={0.5} />
-      <Grid.Container gap={1} justify='center'>
+    <div className='section'>
+      <div className='section-header' style={{ textAlign: 'center' }}>
+        <h3 className='section-title'>Recent Readings</h3>
+      </div>
+      <div className='recent-scroll'>
         {readings.map((reading) => (
-          <Grid xs={12} sm={6} key={reading.dob}>
-            <Card variant='bordered'>
-              <Card.Body>
-                <Text b>{displayDob(reading.dob)}</Text>
-                <Text size='$sm' color='gray'>
-                  {reading.dominantElement} energy
-                </Text>
-                <Text size='$sm'>{reading.insight}</Text>
-                <Spacer y={0.7} />
-                <Grid.Container gap={1}>
-                  <Grid>
-                    <Button
-                      auto
-                      size='sm'
-                      color='secondary'
-                      icon={<MdOpenInNew />}
-                      onPress={() => onOpen(reading.dob)}
-                    >
-                      Open
-                    </Button>
-                  </Grid>
-                  <Grid>
-                    <Button
-                      auto
-                      size='sm'
-                      light
-                      color='error'
-                      icon={<MdDeleteOutline />}
-                      onPress={() => onChange(deleteSavedReading(reading.dob))}
-                    >
-                      Remove
-                    </Button>
-                  </Grid>
-                </Grid.Container>
-              </Card.Body>
-            </Card>
-          </Grid>
+          <div
+            className='recent-card'
+            key={reading.dob}
+            onClick={() => onOpen(reading.dob)}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <p style={{ fontWeight: 600 }}>{displayDob(reading.dob)}</p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange(deleteSavedReading(reading.dob));
+                }}
+                title='Remove reading'
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  background: 'transparent',
+                  color: 'var(--text-tertiary)',
+                  transition: 'color var(--transition-fast), background var(--transition-fast)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#ef4444';
+                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--text-tertiary)';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                <MdDeleteOutline size={16} />
+              </button>
+            </div>
+            <ElementBadge name={reading.dominantElement} />
+            <p className='text-secondary text-xs' style={{ marginTop: 8, lineHeight: 1.4 }}>
+              {reading.insight?.slice(0, 80)}{reading.insight && reading.insight.length > 80 ? '...' : ''}
+            </p>
+          </div>
         ))}
-      </Grid.Container>
-    </>
+      </div>
+    </div>
   );
 }

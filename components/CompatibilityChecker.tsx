@@ -1,9 +1,10 @@
 import BirthDateFields from '@/components/BirthDateFields';
-import { Card, Grid, Loading, Spacer, Text } from '@nextui-org/react';
 import { FormEvent, MouseEvent, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { MdCompareArrows } from 'react-icons/md';
 import { API_BASE_URL, CompatibilityResponse } from '@/lib/api';
 import { DateParts, displayDob, parseDateParts } from '@/lib/dob';
+import ElementBadge from './ElementBadge';
 
 export default function CompatibilityChecker() {
   const [firstValue, setFirstValue] = useState<DateParts>({
@@ -77,19 +78,26 @@ export default function CompatibilityChecker() {
   }
 
   return (
-    <Card variant='bordered'>
-      <Card.Body>
-        <Text h3 size={26}>
-          Compare Two Birthdates
-        </Text>
-        <Text color='gray'>
-          Optional tool for partner, friend, family, or work relationships.
-        </Text>
-        <Spacer y={1} />
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className='glass-card'>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <h3 className='heading-md'>Compare Two Birthdates</h3>
+          <p className='text-secondary text-sm' style={{ marginTop: 4 }}>
+            Check compatibility for partner, friend, family, or work relationships.
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit} noValidate>
-          <Grid.Container gap={1}>
-            <Grid xs={12}>
-              <Text b>First birth date</Text>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* First person */}
+            <div>
+              <p style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: 8 }}>
+                First birthdate
+              </p>
               <BirthDateFields
                 namePrefix='first'
                 prefix='First birth'
@@ -99,9 +107,34 @@ export default function CompatibilityChecker() {
                   setError('');
                 }}
               />
-            </Grid>
-            <Grid xs={12}>
-              <Text b>Second birth date</Text>
+            </div>
+
+            {/* VS divider */}
+            <div style={{ textAlign: 'center' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: 'var(--surface-glass)',
+                  border: '1px solid var(--surface-card-border)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                }}
+              >
+                VS
+              </span>
+            </div>
+
+            {/* Second person */}
+            <div>
+              <p style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: 8 }}>
+                Second birthdate
+              </p>
               <BirthDateFields
                 namePrefix='second'
                 prefix='Second birth'
@@ -111,70 +144,96 @@ export default function CompatibilityChecker() {
                   setError('');
                 }}
               />
-            </Grid>
-          </Grid.Container>
-          <Spacer y={0.8} />
+            </div>
+          </div>
+
+          <div className='spacer-lg' />
+
           <button
             className='primary-action-button'
             disabled={loading}
             type='button'
             onClick={handleButtonClick}
           >
-            {loading ? <Loading type='points' color='currentColor' size='sm' /> : <MdCompareArrows />}
-            Compare
+            {loading ? (
+              <span style={{ display: 'flex', gap: 6 }}>
+                <span className='cosmic-loader-dot' style={{ width: 8, height: 8 }} />
+                <span className='cosmic-loader-dot' style={{ width: 8, height: 8 }} />
+                <span className='cosmic-loader-dot' style={{ width: 8, height: 8 }} />
+              </span>
+            ) : (
+              <>
+                <MdCompareArrows size={20} />
+                <span>Compare</span>
+              </>
+            )}
           </button>
         </form>
+
         {error && (
-          <>
-            <Spacer y={0.7} />
-            <Text color='error'>{error}</Text>
-          </>
+          <p className='error-text' style={{ textAlign: 'center', marginTop: 12 }}>{error}</p>
         )}
 
-        {result && (
-          <>
-            <Spacer y={1.5} />
-            <Grid.Container gap={1}>
-              <Grid xs={12} sm={6}>
-                <Card variant='flat'>
-                  <Card.Body>
-                    <Text b>{displayDob(result.first.dob)}</Text>
-                    <Text color='gray'>
-                      {result.first.dominant_elements[0]?.name ||
-                        result.first.core_numbers.spirit.element}{' '}
-                      energy
-                    </Text>
-                  </Card.Body>
-                </Card>
-              </Grid>
-              <Grid xs={12} sm={6}>
-                <Card variant='flat'>
-                  <Card.Body>
-                    <Text b>{displayDob(result.second.dob)}</Text>
-                    <Text color='gray'>
-                      {result.second.dominant_elements[0]?.name ||
-                        result.second.core_numbers.spirit.element}{' '}
-                      energy
-                    </Text>
-                  </Card.Body>
-                </Card>
-              </Grid>
-            </Grid.Container>
-            <Spacer y={1} />
-            <Text b>Summary</Text>
-            <Text>{result.compatibility.summary}</Text>
-            <Spacer y={0.7} />
-            <Text b>Strengths</Text>
-            <Text>{result.compatibility.strengths}</Text>
-            <Spacer y={0.7} />
-            <Text b>Tension points</Text>
-            <Text>{result.compatibility.tension}</Text>
-            <Spacer y={0.7} />
-            <Text b>Advice</Text>
-            <Text>{result.compatibility.advice}</Text>
-          </>
-        )}
-      </Card.Body>
-    </Card>
+        {/* Result */}
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              style={{ marginTop: 32 }}
+            >
+              {/* VS Cards */}
+              <div className='compat-vs'>
+                <div className='glass-card' style={{ textAlign: 'center', padding: 16 }}>
+                  <p style={{ fontWeight: 600 }}>{displayDob(result.first.dob)}</p>
+                  <div style={{ marginTop: 8 }}>
+                    <ElementBadge
+                      name={
+                        result.first.dominant_elements[0]?.name ||
+                        result.first.core_numbers.spirit.element
+                      }
+                    />
+                  </div>
+                </div>
+                <div className='compat-vs-badge'>VS</div>
+                <div className='glass-card' style={{ textAlign: 'center', padding: 16 }}>
+                  <p style={{ fontWeight: 600 }}>{displayDob(result.second.dob)}</p>
+                  <div style={{ marginTop: 8 }}>
+                    <ElementBadge
+                      name={
+                        result.second.dominant_elements[0]?.name ||
+                        result.second.core_numbers.spirit.element
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Compatibility Details */}
+              <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <p style={{ fontWeight: 600, marginBottom: 4 }}>Summary</p>
+                  <p className='text-secondary text-sm'>{result.compatibility.summary}</p>
+                </div>
+                <div>
+                  <p style={{ fontWeight: 600, marginBottom: 4 }}>Strengths</p>
+                  <p className='text-secondary text-sm'>{result.compatibility.strengths}</p>
+                </div>
+                <div>
+                  <p style={{ fontWeight: 600, marginBottom: 4 }}>Tension points</p>
+                  <p className='text-secondary text-sm'>{result.compatibility.tension}</p>
+                </div>
+                <div className='callout'>
+                  <p style={{ fontWeight: 600, marginBottom: 4, fontSize: '0.875rem' }}>Advice</p>
+                  <p className='text-secondary text-sm'>{result.compatibility.advice}</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
   );
 }

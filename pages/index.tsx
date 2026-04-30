@@ -1,26 +1,21 @@
 import BirthDateFields from '@/components/BirthDateFields';
 import CompatibilityChecker from '@/components/CompatibilityChecker';
+import RecentReadings from '@/components/RecentReadings';
 import ResultExperience from '@/components/ResultExperience';
 import { DateParts, displayDob, dobToDateParts, parseDateParts } from '@/lib/dob';
 import { SavedReading, getSavedReadings } from '@/lib/storage';
-import {
-  Button,
-  Card,
-  Collapse,
-  Container,
-  Grid,
-  Spacer,
-  Text,
-} from '@nextui-org/react';
-import { FormEvent, MouseEvent, useEffect, useState } from 'react';
-import { MdCompareArrows, MdHistory, MdStars } from 'react-icons/md';
+import { FormEvent, MouseEvent, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { MdAutoAwesome, MdCompareArrows, MdHistory } from 'react-icons/md';
 
 export default function Home() {
   const [value, setValue] = useState<DateParts>({ day: '', month: '', year: '' });
   const [dob, setDob] = useState('');
   const [error, setError] = useState('');
+  const [hasAttempted, setHasAttempted] = useState(false);
   const [readings, setReadings] = useState<SavedReading[]>([]);
   const [showCompatibility, setShowCompatibility] = useState(false);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setReadings(getSavedReadings());
@@ -60,6 +55,7 @@ export default function Home() {
   }
 
   function handleCalculate(nextValue: DateParts = value) {
+    setHasAttempted(true);
     const parsed = parseDateParts(nextValue);
     if (parsed.error) {
       setError(parsed.error);
@@ -69,6 +65,11 @@ export default function Home() {
 
     setError('');
     setDob(parsed.dob);
+
+    // Scroll to results after a brief delay
+    setTimeout(() => {
+      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -90,170 +91,245 @@ export default function Home() {
     setValue(dobToDateParts(savedDob));
     setDob(savedDob);
     setError('');
+    setTimeout(() => {
+      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
   }
 
   return (
     <>
-      <Container css={{ minHeight: dob ? 'auto' : '100vh', paddingLeft: '$0', paddingRight: '$0' }}>
-        <Container xs display='flex' alignContent='center' css={{}}>
-          <div
-            style={{
-              alignItems: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-            }}
+      {/* Hero Section */}
+      <section
+        style={{
+          minHeight: dob ? 'auto' : '80vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: dob ? 'flex-start' : 'center',
+          padding: dob ? '32px 0 0' : '0',
+          transition: 'all 0.5s ease',
+        }}
+      >
+        <div className='container'>
+          {/* Hero Text */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            style={{ textAlign: 'center', marginBottom: 32 }}
           >
-            <Spacer css={{ '@xs': { paddingTop: '6rem' } }} />
-            <Text
-              h1
-              size={42}
-              weight='bold'
-              css={{ textAlign: 'center', maxW: '780px' }}
-            >
-              Get Your
-              <Text
-                span
-                css={{ textGradient: '45deg, $purple600 -20%, $pink600 100%' }}
-              >
-                {' '}
-                Birthdate Reading
-              </Text>
-            </Text>
-            <Text color='gray' size={17} css={{ textAlign: 'center', maxW: '620px' }}>
-              Pick your date. See your chart, element, and one practical step.
-            </Text>
-          </div>
-
-          <Spacer y={3} />
-          <Container wrap='wrap'>
-            <div>
-              <Card variant='bordered'>
-                <Card.Body>
-                  <Text
-                    size='$2xl'
-                    css={{ textAlign: 'center', fontWeight: '$bold' }}
-                  >
-                    Start with your birth date
-                  </Text>
-                  <Text color='gray' css={{ textAlign: 'center' }}>
-                    No signup. Your reading is saved only on this device.
-                  </Text>
-                  <Spacer y={1} />
-                  <form onSubmit={handleSubmit} noValidate>
-                    <BirthDateFields
-                      namePrefix='birth'
-                      value={value}
-                      onChange={(nextValue) => {
-                        setValue(nextValue);
-                        setError('');
-                      }}
-                    />
-                    {error && (
-                      <>
-                        <Spacer y={0.5} />
-                        <Text color='error' size='$sm'>
-                          {error}
-                        </Text>
-                      </>
-                    )}
-                    <Spacer y={0.8} />
-                    <button
-                      className='primary-action-button'
-                      type='button'
-                      onClick={handleButtonClick}
-                    >
-                      <MdStars />
-                      Get My Reading
-                    </button>
-                  </form>
-                </Card.Body>
-              </Card>
-            </div>
-
-            {!dob && readings.length > 0 && (
+            {!dob ? (
               <>
-                <Spacer y={1} />
-                <Grid.Container gap={1} justify='center'>
-                  <Grid>
-                    <Button
-                      auto
-                      light
-                      color='secondary'
-                      icon={<MdHistory />}
-                      onPress={() => openReading(readings[0].dob)}
-                    >
-                      Continue {displayDob(readings[0].dob)}
-                    </Button>
-                  </Grid>
-                </Grid.Container>
+                <h1 className='heading-xl'>
+                  Discover Your{' '}
+                  <span className='text-gradient'>Birth Code</span>
+                </h1>
+                <p className='text-secondary' style={{ marginTop: 12, maxWidth: 460, margin: '12px auto 0' }}>
+                  Pick your date. See your chart, element, and one practical step.
+                </p>
               </>
-            )}
-
-            {dob && (
-              <>
-                <ResultExperience dob={dob} onSaved={setReadings} />
-                <Spacer y={2} />
-              </>
-            )}
-
-            <Spacer y={1} />
-            <Grid.Container gap={1} justify='center'>
-              <Grid>
-                <Button
-                  auto
-                  light={!showCompatibility}
-                  color='secondary'
-                  icon={<MdCompareArrows />}
-                  onPress={() => setShowCompatibility(!showCompatibility)}
+            ) : (
+              <p className='text-secondary text-sm'>
+                Reading for <strong style={{ color: 'var(--text-primary)' }}>{displayDob(dob)}</strong>
+                {' · '}
+                <button
+                  onClick={() => { setDob(''); setShowCompatibility(false); }}
+                  style={{
+                    color: 'var(--primary-purple)',
+                    fontWeight: 500,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '3px',
+                    cursor: 'pointer',
+                    background: 'none',
+                    border: 'none',
+                    font: 'inherit',
+                    fontSize: 'inherit',
+                  }}
                 >
-                  Compare Two Birthdates
-                </Button>
-              </Grid>
-            </Grid.Container>
-            {showCompatibility && (
-              <>
-                <Spacer y={1} />
-                <CompatibilityChecker />
-              </>
+                  New reading
+                </button>
+              </p>
             )}
-          </Container>
-        </Container>
-      </Container>
+          </motion.div>
 
-      {!dob && (
-        <Container xs>
-          <Spacer y={2} />
-          <Text size='$2xl' css={{ textAlign: 'center', fontWeight: '$bold' }}>
-            What You Get
-          </Text>
-          <Text color='gray' css={{ textAlign: 'center' }}>
-            Simple result first. Details are available when you want them.
-          </Text>
-          <Spacer y={1} />
-          <Collapse.Group splitted>
-            <Collapse title='Your chart and element' subtitle='A visual numerology chart with your dominant element.'>
-              <Text>
-                Your reading starts with the chart image, then explains your strongest
-                element in plain language.
-              </Text>
-            </Collapse>
-            <Collapse title='Personal reading' subtitle='Spirit, physical, and ending numbers summarized.'>
-              <Text>
-                The reading turns your core numbers into a short profile, practical
-                strengths, and a useful next step.
-              </Text>
-            </Collapse>
-            <Collapse title='Save, share, and compare' subtitle='Optional tools after the main reading.'>
-              <Text>
-                Save recent readings on this device, copy a private result link, download
-                a result card, or compare two birthdates.
-              </Text>
-            </Collapse>
-          </Collapse.Group>
-          <Spacer y={2} />
-        </Container>
-      )}
+          {/* Input Card */}
+          {!dob && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+            >
+              <div className='glass-card glass-card--glow' style={{ maxWidth: 440, margin: '0 auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                  <p style={{ fontWeight: 600, fontSize: '1.05rem' }}>
+                    Enter your birth date
+                  </p>
+                  <p className='text-secondary text-sm' style={{ marginTop: 4 }}>
+                    No signup. Saved only on your device.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSubmit} noValidate>
+                  <BirthDateFields
+                    namePrefix='birth'
+                    value={value}
+                    hasError={hasAttempted && !!error}
+                    onChange={(nextValue) => {
+                      setValue(nextValue);
+                      setError('');
+                      setHasAttempted(false);
+                    }}
+                  />
+
+                  {error && hasAttempted && (
+                    <p className='error-text' style={{ textAlign: 'center' }}>{error}</p>
+                  )}
+
+                  <div className='spacer-lg' />
+
+                  <button
+                    className='primary-action-button'
+                    type='button'
+                    onClick={handleButtonClick}
+                  >
+                    <MdAutoAwesome size={18} />
+                    <span>Reveal My Reading</span>
+                  </button>
+                </form>
+              </div>
+
+              {/* Continue last reading */}
+              {readings.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  style={{ textAlign: 'center', marginTop: 20 }}
+                >
+                  <button
+                    className='secondary-button'
+                    onClick={() => openReading(readings[0].dob)}
+                  >
+                    <MdHistory size={16} />
+                    Continue {displayDob(readings[0].dob)}
+                  </button>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Result */}
+          {dob && (
+            <div ref={resultRef}>
+              <ResultExperience dob={dob} onSaved={setReadings} />
+
+              {/* Compatibility Hint */}
+              {!showCompatibility && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <div
+                    className='compat-hint'
+                    onClick={() => setShowCompatibility(true)}
+                    role='button'
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setShowCompatibility(true)}
+                  >
+                    <MdCompareArrows size={22} style={{ color: 'var(--primary-purple)' }} />
+                    <span className='compat-hint-text'>
+                      Now check your compatibility with someone
+                    </span>
+                    <span className='compat-hint-arrow'>→</span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Compatibility Checker */}
+              <AnimatePresence>
+                {showCompatibility && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.4 }}
+                    style={{ overflow: 'hidden', marginTop: 24 }}
+                  >
+                    <CompatibilityChecker />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className='spacer-2xl' />
+            </div>
+          )}
+
+          {/* Recent Readings (shown when no active result) */}
+          {!dob && readings.length > 1 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              style={{ marginTop: 40 }}
+            >
+              <RecentReadings
+                readings={readings}
+                onOpen={openReading}
+                onChange={setReadings}
+              />
+            </motion.div>
+          )}
+
+          {/* "What You Get" section (shown when no result) */}
+          {!dob && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              style={{ marginTop: 48 }}
+            >
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <h2 className='heading-lg'>What You Get</h2>
+                <p className='text-secondary' style={{ marginTop: 4 }}>
+                  Simple result first. Details when you want them.
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 440, margin: '0 auto' }}>
+                <FeatureCard
+                  emoji='🌟'
+                  title='Your chart & element'
+                  description='A visual numerology chart with your dominant element explained in plain language.'
+                />
+                <FeatureCard
+                  emoji='🔮'
+                  title='Personal reading'
+                  description='Spirit, physical, and ending numbers turned into a short profile with practical strengths.'
+                />
+                <FeatureCard
+                  emoji='📤'
+                  title='Share & compare'
+                  description='Share your result on social media, download a card, or compare with someone else.'
+                />
+              </div>
+              <div className='spacer-3xl' />
+            </motion.div>
+          )}
+        </div>
+      </section>
     </>
+  );
+}
+
+/* --- Feature Card --- */
+function FeatureCard({ emoji, title, description }: { emoji: string; title: string; description: string }) {
+  return (
+    <div className='glass-card' style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+      <span style={{ fontSize: '1.5rem', flexShrink: 0, marginTop: 2 }}>{emoji}</span>
+      <div>
+        <p style={{ fontWeight: 600, marginBottom: 2 }}>{title}</p>
+        <p className='text-secondary text-sm'>{description}</p>
+      </div>
+    </div>
   );
 }
