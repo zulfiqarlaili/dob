@@ -157,25 +157,25 @@ export default function ResultExperience({ dob, onSaved }: ResultExperienceProps
     context.font = '700 56px Arial, sans-serif';
     context.fillStyle = '#f1f5f9';
     context.textAlign = 'center';
-    context.fillText(`${emoji} ${element}`, 540, 1010);
+    context.fillText(`${emoji} ${element}`, 540, 1110);
 
     // Personality
     if (analysis.dominant_elements[0]?.personality) {
       context.font = '400 28px Arial, sans-serif';
       context.fillStyle = '#94a3b8';
-      wrapText(context, analysis.dominant_elements[0].personality, 540, 1060, 800, 38);
+      wrapText(context, analysis.dominant_elements[0].personality, 540, 1160, 800, 38);
     }
 
     // Personal reading headline
     context.textAlign = 'left';
     context.font = '700 36px Arial, sans-serif';
     context.fillStyle = '#f1f5f9';
-    wrapText(context, analysis.personal_reading.headline, 80, 1180, 920, 46);
+    wrapText(context, analysis.personal_reading.headline, 80, 1280, 920, 46);
 
     // Summary
     context.font = '400 28px Arial, sans-serif';
     context.fillStyle = '#94a3b8';
-    const nextY = wrapText(context, analysis.personal_reading.summary, 80, 1260, 920, 40);
+    const nextY = wrapText(context, analysis.personal_reading.summary, 80, 1360, 920, 40);
 
     // Weekly insight
     const insightGrad = context.createLinearGradient(0, 0, 1080, 0);

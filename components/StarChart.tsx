@@ -224,18 +224,19 @@ export function drawStarChartToCanvas(
         ctx.textAlign = 'left'; ctx.fillText(LABELS[i], p.x + 30, p.y + 2); ctx.textAlign = 'center';
       }
     }
-    ctx.fillStyle = color; ctx.font = `700 ${isCore ? 24 : 22}px "Space Grotesk",Inter,sans-serif`;
+    ctx.fillStyle = color; ctx.font = `700 ${isCore ? 32 : 30}px "Space Grotesk",Inter,sans-serif`;
     ctx.fillText(String(num), p.x, p.y);
   });
 
   const counts = calculateElementCounts(numbers);
   counts.forEach((el, i) => {
-    const y = 450 + i * 30;
-    ctx.beginPath(); ctx.arc(35, y, 8, 0, Math.PI * 2); ctx.fillStyle = el.color; ctx.fill();
+    const y = 400 + i * 30;
+    const xOff = -20; // match SVG translate(-20, 0)
+    ctx.beginPath(); ctx.arc(35 + xOff, y, 8, 0, Math.PI * 2); ctx.fillStyle = el.color; ctx.fill();
     ctx.fillStyle = 'rgba(241,245,249,0.85)'; ctx.font = '600 15px Inter,sans-serif';
-    ctx.textAlign = 'left'; ctx.fillText(el.name, 52, y + 1);
+    ctx.textAlign = 'left'; ctx.fillText(el.name, 52 + xOff, y + 1);
     ctx.fillStyle = el.color; ctx.font = '700 15px Inter,sans-serif';
-    ctx.fillText(`× ${el.count}`, 120, y + 1); ctx.textAlign = 'center';
+    ctx.fillText(`× ${el.count}`, 120 + xOff, y + 1); ctx.textAlign = 'center';
   });
 
   ctx.restore();
