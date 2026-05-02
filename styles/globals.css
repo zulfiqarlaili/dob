@@ -867,6 +867,68 @@ input {
   animation: shake 0.4s ease-in-out;
 }
 
+/* --- Star Chart --- */
+.star-chart-wrapper {
+  background: linear-gradient(
+    180deg,
+    rgba(22, 22, 56, 0.6) 0%,
+    rgba(10, 10, 26, 0.8) 100%
+  );
+  border: 1px solid var(--surface-card-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg) var(--space-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.star-chart-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius-xl);
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(168, 85, 247, 0.35),
+    rgba(236, 72, 153, 0.08),
+    rgba(59, 130, 246, 0.2)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* Radial ambient glow behind the chart */
+.star-chart-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(168, 85, 247, 0.08) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star-chart-svg {
+  width: 100%;
+  height: auto;
+  max-width: 500px;
+  display: block;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+
 /* --- Responsive --- */
 @media (max-width: 480px) {
   :root {

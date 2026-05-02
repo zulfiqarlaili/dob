@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { MdDownload } from 'react-icons/md';
 import { API_BASE_URL, AnalysisResponse, ChartExplanation } from '@/lib/api';
+import { StarChartData, computeStarArray } from '@/lib/chart';
 import { displayDob, encodeDob } from '@/lib/dob';
 import { SavedReading, saveReading } from '@/lib/storage';
-import ShareButtons from './ShareButtons';
 import ElementBadge, { getElementColor, getElementEmoji } from './ElementBadge';
+import ShareButtons from './ShareButtons';
+import StarChart, { drawStarChartToCanvas } from './StarChart';
 
 type ResultExperienceProps = {
   dob: string;
@@ -55,11 +56,16 @@ function wrapText(
 
 export default function ResultExperience({ dob, onSaved }: ResultExperienceProps) {
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
-  const [image, setImage] = useState('');
   const [activeExplanation, setActiveExplanation] = useState<ChartExplanation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
+
+  // Compute chart data locally (no backend image needed)
+  const chartData = useMemo<StarChartData | null>(() => {
+    if (!dob || dob.length !== 8) return null;
+    return computeStarArray(dob);
+  }, [dob]);
 
   const shareUrl = useMemo(() => {
     if (typeof window === 'undefined') return '';
@@ -73,27 +79,18 @@ export default function ResultExperience({ dob, onSaved }: ResultExperienceProps
   }, [analysis]);
 
   useEffect(() => {
-    let imageUrl = '';
     setLoading(true);
     setError('');
     setAnalysis(null);
-    setImage('');
 
-    Promise.all([
-      fetch(`${API_BASE_URL}/analysis/${dob}`).then((response) => {
+    fetch(`${API_BASE_URL}/analysis/${dob}`)
+      .then((response) => {
         if (!response.ok) throw new Error('Unable to load your reading.');
         return response.json();
-      }),
-      fetch(`${API_BASE_URL}/result/${dob}`).then((response) => {
-        if (!response.ok) throw new Error('Unable to generate your chart.');
-        return response.blob();
-      }),
-    ])
-      .then(([analysisJson, imageBlob]: [AnalysisResponse, Blob]) => {
-        imageUrl = URL.createObjectURL(imageBlob);
+      })
+      .then((analysisJson: AnalysisResponse) => {
         setAnalysis(analysisJson);
         setActiveExplanation(analysisJson.chart_explanations[0] || null);
-        setImage(imageUrl);
         onSaved?.(saveReading(analysisJson));
       })
       .catch((fetchError: Error) => {
@@ -102,10 +99,6 @@ export default function ResultExperience({ dob, onSaved }: ResultExperienceProps
       .finally(() => {
         setLoading(false);
       });
-
-    return () => {
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
-    };
   }, [dob, onSaved]);
 
   async function copyShareLink() {
@@ -121,7 +114,7 @@ export default function ResultExperience({ dob, onSaved }: ResultExperienceProps
   }
 
   function downloadCard() {
-    if (!analysis || !image) return;
+    if (!analysis || !chartData) return;
 
     const canvas = document.createElement('canvas');
     canvas.width = 1080;
@@ -155,72 +148,54 @@ export default function ResultExperience({ dob, onSaved }: ResultExperienceProps
     context.fillStyle = '#94a3b8';
     context.fillText(displayDob(analysis.dob), 540, 165);
 
-    const chart = new window.Image();
-    chart.onload = () => {
-      // Chart image
-      const chartSize = 700;
-      const chartX = (1080 - chartSize) / 2;
-      context.save();
-      context.beginPath();
-      context.roundRect(chartX, 210, chartSize, chartSize, 20);
-      context.clip();
-      context.drawImage(chart, chartX, 210, chartSize, chartSize);
-      context.restore();
+    // Draw the star chart to canvas (replaces backend image)
+    drawStarChartToCanvas(context, chartData, 140, 200, 1.6);
 
-      // Chart border glow
-      context.strokeStyle = 'rgba(168, 85, 247, 0.3)';
-      context.lineWidth = 2;
-      context.beginPath();
-      context.roundRect(chartX, 210, chartSize, chartSize, 20);
-      context.stroke();
+    // Element name
+    const element = analysis.dominant_elements[0]?.name || 'Unknown';
+    const emoji = getElementEmoji(element);
+    context.font = '700 56px Arial, sans-serif';
+    context.fillStyle = '#f1f5f9';
+    context.textAlign = 'center';
+    context.fillText(`${emoji} ${element}`, 540, 1010);
 
-      // Element name
-      const element = analysis.dominant_elements[0]?.name || 'Unknown';
-      const emoji = getElementEmoji(element);
-      context.font = '700 56px Arial, sans-serif';
-      context.fillStyle = '#f1f5f9';
-      context.textAlign = 'center';
-      context.fillText(`${emoji} ${element}`, 540, 1010);
-
-      // Personality
-      if (analysis.dominant_elements[0]?.personality) {
-        context.font = '400 28px Arial, sans-serif';
-        context.fillStyle = '#94a3b8';
-        wrapText(context, analysis.dominant_elements[0].personality, 540, 1060, 800, 38);
-      }
-
-      // Personal reading headline
-      context.textAlign = 'left';
-      context.font = '700 36px Arial, sans-serif';
-      context.fillStyle = '#f1f5f9';
-      wrapText(context, analysis.personal_reading.headline, 80, 1180, 920, 46);
-
-      // Summary
+    // Personality
+    if (analysis.dominant_elements[0]?.personality) {
       context.font = '400 28px Arial, sans-serif';
       context.fillStyle = '#94a3b8';
-      const nextY = wrapText(context, analysis.personal_reading.summary, 80, 1260, 920, 40);
+      wrapText(context, analysis.dominant_elements[0].personality, 540, 1060, 800, 38);
+    }
 
-      // Weekly insight
-      const insightGrad = context.createLinearGradient(0, 0, 1080, 0);
-      insightGrad.addColorStop(0, '#a855f7');
-      insightGrad.addColorStop(1, '#ec4899');
-      context.fillStyle = insightGrad;
-      context.font = '600 28px Arial, sans-serif';
-      wrapText(context, analysis.weekly_insight.message, 80, nextY + 40, 920, 40);
+    // Personal reading headline
+    context.textAlign = 'left';
+    context.font = '700 36px Arial, sans-serif';
+    context.fillStyle = '#f1f5f9';
+    wrapText(context, analysis.personal_reading.headline, 80, 1180, 920, 46);
 
-      // Branding
-      context.textAlign = 'center';
-      context.font = '700 28px Arial, sans-serif';
-      context.fillStyle = '#64748b';
-      context.fillText('borndate.web.app', 540, 1840);
+    // Summary
+    context.font = '400 28px Arial, sans-serif';
+    context.fillStyle = '#94a3b8';
+    const nextY = wrapText(context, analysis.personal_reading.summary, 80, 1260, 920, 40);
 
-      // Download
-      const link = document.createElement('a');
-      link.download = `borndate-${analysis.dob}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    };
-    chart.src = image;
+    // Weekly insight
+    const insightGrad = context.createLinearGradient(0, 0, 1080, 0);
+    insightGrad.addColorStop(0, '#a855f7');
+    insightGrad.addColorStop(1, '#ec4899');
+    context.fillStyle = insightGrad;
+    context.font = '600 28px Arial, sans-serif';
+    wrapText(context, analysis.weekly_insight.message, 80, nextY + 40, 920, 40);
+
+    // Branding
+    context.textAlign = 'center';
+    context.font = '700 28px Arial, sans-serif';
+    context.fillStyle = '#64748b';
+    context.fillText('borndate.web.app', 540, 1840);
+
+    // Download
+    const link = document.createElement('a');
+    link.download = `borndate-${analysis.dob}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   }
 
   if (loading) {
@@ -260,13 +235,10 @@ export default function ResultExperience({ dob, onSaved }: ResultExperienceProps
         <p className='text-secondary'>{displayDob(analysis.dob)}</p>
       </motion.div>
 
-      {/* Section: Chart */}
-      {image && (
+      {/* Section: Chart (rendered in frontend) */}
+      {chartData && (
         <motion.div variants={fadeUp} className='section'>
-          <div className='chart-card'>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image} alt='Your numerology chart' />
-          </div>
+          <StarChart data={chartData} />
         </motion.div>
       )}
 
