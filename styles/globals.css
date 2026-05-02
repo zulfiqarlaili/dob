@@ -774,34 +774,6 @@ input {
   transform: translateY(-2px);
 }
 
-/* --- Chart Image --- */
-.chart-card {
-  background: var(--surface-card);
-  border: 1px solid var(--surface-card-border);
-  border-radius: var(--radius-xl);
-  padding: var(--space-md);
-  position: relative;
-  overflow: hidden;
-}
-
-.chart-card::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: var(--radius-xl);
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.1), rgba(59, 130, 246, 0.2));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.chart-card img {
-  width: 100%;
-  border-radius: var(--radius-md);
-}
-
 /* --- Compatibility VS Layout --- */
 .compat-vs {
   display: grid;
