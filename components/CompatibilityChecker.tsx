@@ -2,7 +2,7 @@ import BirthDateFields from '@/components/BirthDateFields';
 import { FormEvent, MouseEvent, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MdCompareArrows } from 'react-icons/md';
-import { API_BASE_URL, CompatibilityResponse } from '@/lib/api';
+import { CompatibilityResponse, buildCompatibilityResponse } from '@/lib/metaphysic';
 import { DateParts, displayDob, parseDateParts } from '@/lib/dob';
 import ElementBadge from './ElementBadge';
 
@@ -46,11 +46,7 @@ export default function CompatibilityChecker() {
     setResult(null);
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/compatibility/${first.dob}/${second.dob}`,
-      );
-      if (!response.ok) throw new Error('Unable to compare these readings.');
-      setResult(await response.json());
+      setResult(buildCompatibilityResponse(first.dob, second.dob));
     } catch (compareError) {
       setError(compareError instanceof Error ? compareError.message : 'Unable to compare.');
     } finally {

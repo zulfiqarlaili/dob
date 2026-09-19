@@ -1,4 +1,4 @@
-import { AnalysisResponse } from './api';
+import { AnalysisResponse } from './metaphysic';
 import { displayDob, encodeDob } from './dob';
 
 const READINGS_KEY = 'borndate:saved-readings';

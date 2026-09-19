@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { API_BASE_URL, AnalysisResponse, ChartExplanation } from '@/lib/api';
+import {
+  AnalysisResponse,
+  ChartExplanation,
+  buildAnalysisResponse,
+  checkDob,
+} from '@/lib/metaphysic';
 import { StarChartData, computeStarArray } from '@/lib/chart';
 import { displayDob, encodeDob } from '@/lib/dob';
 import { SavedReading, saveReading } from '@/lib/storage';
@@ -57,7 +62,6 @@ function wrapText(
 export default function ResultExperience({ dob, onSaved }: ResultExperienceProps) {
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [activeExplanation, setActiveExplanation] = useState<ChartExplanation | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
 
@@ -79,26 +83,19 @@ export default function ResultExperience({ dob, onSaved }: ResultExperienceProps
   }, [analysis]);
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    setAnalysis(null);
+    if (!checkDob(dob)) {
+      setError('Unable to load your reading.');
+      return;
+    }
 
-    fetch(`${API_BASE_URL}/analysis/${dob}`)
-      .then((response) => {
-        if (!response.ok) throw new Error('Unable to load your reading.');
-        return response.json();
-      })
-      .then((analysisJson: AnalysisResponse) => {
-        setAnalysis(analysisJson);
-        setActiveExplanation(analysisJson.chart_explanations[0] || null);
-        onSaved?.(saveReading(analysisJson));
-      })
-      .catch((fetchError: Error) => {
-        setError(fetchError.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    try {
+      const analysisJson = buildAnalysisResponse(dob);
+      setAnalysis(analysisJson);
+      setActiveExplanation(analysisJson.chart_explanations[0] || null);
+      onSaved?.(saveReading(analysisJson));
+    } catch (analysisError) {
+      setError(analysisError instanceof Error ? analysisError.message : 'Unable to load your reading.');
+    }
   }, [dob, onSaved]);
 
   async function copyShareLink() {
@@ -196,19 +193,6 @@ export default function ResultExperience({ dob, onSaved }: ResultExperienceProps
     link.download = `borndate-${analysis.dob}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
-  }
-
-  if (loading) {
-    return (
-      <div className='cosmic-loader' style={{ flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <div className='cosmic-loader-dot' />
-          <div className='cosmic-loader-dot' />
-          <div className='cosmic-loader-dot' />
-        </div>
-        <p className='cosmic-loader-text'>Reading the stars...</p>
-      </div>
-    );
   }
 
   if (error) {
