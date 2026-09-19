@@ -1,56 +1,62 @@
 import ResultExperience from '@/components/ResultExperience';
-import { decodeDob, displayDob } from '@/lib/dob';
+import { decodeDob, displayDob, parseDisplayDob } from '@/lib/dob';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { MdAutoAwesome } from 'react-icons/md';
 
 export default function SharedResult() {
   const router = useRouter();
-  const dob = useMemo(() => {
-    const encoded = router.query.d;
-    return typeof encoded === 'string' ? decodeDob(encoded) : '';
-  }, [router.query.d]);
-
+  const encoded = router.query.d;
+  const decoded = typeof encoded === 'string' ? decodeDob(encoded) : '';
+  const dob = decoded && !parseDisplayDob(decoded).error ? decoded : '';
   return (
     <>
       <Head>
         <meta name='robots' content='noindex,nofollow' />
-        <title>{dob ? `BornDate Reading — ${displayDob(dob)}` : 'BornDate Reading'}</title>
+        <title>
+          {dob ? `BornDate Reading — ${displayDob(dob)}` : 'BornDate Reading'}
+        </title>
       </Head>
-      <div className='container' style={{ paddingTop: 32, paddingBottom: 48 }}>
-        {!router.isReady ? null : dob ? (
+      <div className='reading-container'>
+        {!router.isReady ? (
+          <p className='text-secondary' role='status'>
+            Opening your reading…
+          </p>
+        ) : dob ? (
           <>
-            <ResultExperience dob={dob} />
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              style={{ marginTop: 48, textAlign: 'center' }}
-            >
-              <Link href='/'>
-                <button className='primary-action-button' style={{ maxWidth: 320, margin: '0 auto' }}>
-                  <MdAutoAwesome size={18} />
-                  <span>Get Your Own Reading</span>
-                </button>
+            <div className='reading-toolbar'>
+              <span className='eyebrow'>A shared discovery</span>
+              <Link className='text-button' href='/'>
+                Your own reading →
               </Link>
-            </motion.div>
+            </div>
+            <ResultExperience key={dob} dob={dob} />
+            <section className='shared-cta'>
+              <span aria-hidden='true'>✧</span>
+              <h2>What’s written in your birthday?</h2>
+              <p className='text-secondary'>
+                Your own little moment of discovery is one date away.
+              </p>
+              <Link className='primary-action-button' href='/'>
+                Reveal my reading <span aria-hidden='true'>→</span>
+              </Link>
+            </section>
           </>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{ textAlign: 'center', padding: '80px 0' }}
-          >
-            <h1 className='heading-lg'>This result link is not valid.</h1>
-            <p className='text-secondary' style={{ marginTop: 12 }}>
-              <Link href='/' style={{ color: 'var(--primary-purple)', fontWeight: 500 }}>
-                Create a new reading →
-              </Link>
+          <div className='empty-state'>
+            <span className='empty-symbol' aria-hidden='true'>
+              ✧
+            </span>
+            <p className='eyebrow'>Let’s start fresh</p>
+            <h1>This reading link isn’t valid.</h1>
+            <p className='text-secondary'>
+              The link may be incomplete. You can still discover your own
+              reading with just your birthday.
             </p>
-          </motion.div>
+            <Link className='primary-action-button' href='/'>
+              Create a new reading <span aria-hidden='true'>→</span>
+            </Link>
+          </div>
         )}
       </div>
     </>

@@ -1,235 +1,179 @@
 import BirthDateFields from '@/components/BirthDateFields';
-import { FormEvent, MouseEvent, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { MdCompareArrows } from 'react-icons/md';
-import { CompatibilityResponse, buildCompatibilityResponse } from '@/lib/metaphysic';
-import { DateParts, displayDob, parseDateParts } from '@/lib/dob';
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import {
+  CompatibilityResponse,
+  buildCompatibilityResponse,
+} from '@/lib/metaphysic';
+import {
+  DateParts,
+  displayDob,
+  dobToDateParts,
+  parseDateParts,
+} from '@/lib/dob';
 import ElementBadge from './ElementBadge';
 
-export default function CompatibilityChecker() {
-  const [firstValue, setFirstValue] = useState<DateParts>({
-    day: '',
-    month: '',
-    year: '',
-  });
+export default function CompatibilityChecker({
+  currentDob = '',
+}: {
+  currentDob?: string;
+}) {
+  const [firstValue, setFirstValue] = useState<DateParts>(() =>
+    dobToDateParts(currentDob)
+  );
   const [secondValue, setSecondValue] = useState<DateParts>({
     day: '',
     month: '',
     year: '',
   });
   const [result, setResult] = useState<CompatibilityResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({ first: '', second: '', general: '' });
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
-  function getDatePartsFromForm(form: HTMLFormElement, prefix: string): DateParts {
-    const data = new FormData(form);
-    return {
-      day: String(data.get(`${prefix}-day`) || '').replace(/\D/g, '').slice(0, 2),
-      month: String(data.get(`${prefix}-month`) || '').replace(/\D/g, '').slice(0, 2),
-      year: String(data.get(`${prefix}-year`) || '').replace(/\D/g, '').slice(0, 4),
-    };
-  }
-
-  async function compare(
-    nextFirstValue: DateParts = firstValue,
-    nextSecondValue: DateParts = secondValue,
-  ) {
-    const first = parseDateParts(nextFirstValue);
-    const second = parseDateParts(nextSecondValue);
-    if (first.error || second.error) {
-      setError(first.error || second.error);
-      return;
-    }
-
-    setLoading(true);
-    setError('');
+  useEffect(() => {
+    setFirstValue(dobToDateParts(currentDob));
+    setSecondValue({ day: '', month: '', year: '' });
     setResult(null);
+    setErrors({ first: '', second: '', general: '' });
+  }, [currentDob]);
 
-    try {
-      setResult(buildCompatibilityResponse(first.dob, second.dob));
-    } catch (compareError) {
-      setError(compareError instanceof Error ? compareError.message : 'Unable to compare.');
-    } finally {
-      setLoading(false);
-    }
-  }
+  useEffect(() => {
+    if (result) headingRef.current?.focus();
+  }, [result]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const nextFirstValue = getDatePartsFromForm(event.currentTarget, 'first');
-    const nextSecondValue = getDatePartsFromForm(event.currentTarget, 'second');
-    setFirstValue(nextFirstValue);
-    setSecondValue(nextSecondValue);
-    compare(nextFirstValue, nextSecondValue);
-  }
-
-  function handleButtonClick(event: MouseEvent<HTMLButtonElement>) {
-    const form = event.currentTarget.form;
-    if (!form) return;
-    const nextFirstValue = getDatePartsFromForm(form, 'first');
-    const nextSecondValue = getDatePartsFromForm(form, 'second');
-    setFirstValue(nextFirstValue);
-    setSecondValue(nextSecondValue);
-    compare(nextFirstValue, nextSecondValue);
+    const data = new FormData(event.currentTarget);
+    const read = (prefix: string) => ({
+      day: String(data.get(`${prefix}-day`) || ''),
+      month: String(data.get(`${prefix}-month`) || ''),
+      year: String(data.get(`${prefix}-year`) || ''),
+    });
+    const nextFirst = read('first');
+    const nextSecond = read('second');
+    setFirstValue(nextFirst);
+    setSecondValue(nextSecond);
+    const first = parseDateParts(nextFirst);
+    const second = parseDateParts(nextSecond);
+    setErrors({ first: first.error, second: second.error, general: '' });
+    setResult(null);
+    if (first.error || second.error) {
+      document
+        .getElementById(first.error ? 'first-day' : 'second-day')
+        ?.focus();
+      return;
+    }
+    try {
+      setResult(buildCompatibilityResponse(first.dob, second.dob));
+    } catch {
+      setErrors({
+        first: '',
+        second: '',
+        general: 'We couldn’t compare those dates. Please try again.',
+      });
+    }
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className='glass-card'>
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <h3 className='heading-md'>Compare Two Birthdates</h3>
-          <p className='text-secondary text-sm' style={{ marginTop: 4 }}>
-            Check compatibility for partner, friend, family, or work relationships.
-          </p>
+    <div className='compatibility-checker'>
+      <h2>Two birthdays. A new perspective.</h2>
+      <p className='text-secondary'>
+        Explore how your personalities might complement each other.
+      </p>
+      <form onSubmit={handleSubmit} noValidate>
+        <div className='comparison-fields'>
+          <fieldset>
+            <legend>Your birthday</legend>
+            <BirthDateFields
+              namePrefix='first'
+              prefix='Your birth'
+              value={firstValue}
+              hasError={!!errors.first}
+              describedBy={errors.first ? 'first-error' : undefined}
+              onChange={(next) => {
+                setFirstValue(next);
+                setResult(null);
+                setErrors({ first: '', second: '', general: '' });
+              }}
+            />
+            {errors.first && (
+              <p id='first-error' className='error-text' role='alert'>
+                {errors.first}
+              </p>
+            )}
+          </fieldset>
+          <fieldset>
+            <legend>Their birthday</legend>
+            <BirthDateFields
+              namePrefix='second'
+              prefix='Their birth'
+              value={secondValue}
+              hasError={!!errors.second}
+              describedBy={errors.second ? 'second-error' : undefined}
+              onChange={(next) => {
+                setSecondValue(next);
+                setResult(null);
+                setErrors({ first: '', second: '', general: '' });
+              }}
+            />
+            {errors.second && (
+              <p id='second-error' className='error-text' role='alert'>
+                {errors.second}
+              </p>
+            )}
+          </fieldset>
         </div>
-
-        <form onSubmit={handleSubmit} noValidate>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {/* First person */}
+        {errors.general && (
+          <p className='error-text' role='alert'>
+            {errors.general}
+          </p>
+        )}
+        <button className='primary-action-button' type='submit'>
+          Discover your connection <span aria-hidden='true'>→</span>
+        </button>
+      </form>
+      {result && (
+        <section
+          className='comparison-result fade-in'
+          aria-labelledby='connection-title'
+        >
+          <p className='eyebrow'>Your connection</p>
+          <h3 id='connection-title' ref={headingRef} tabIndex={-1}>
+            A little insight into the two of you
+          </h3>
+          <div className='comparison-people'>
+            {[result.first, result.second].map((person, index) => (
+              <div key={index}>
+                <span className='text-secondary'>
+                  {index === 0 ? 'You' : 'Them'} · {displayDob(person.dob)}
+                </span>
+                <ElementBadge
+                  name={
+                    person.dominant_elements[0]?.name ||
+                    person.core_numbers.spirit.element
+                  }
+                />
+              </div>
+            ))}
+          </div>
+          <p className='connection-summary'>{result.compatibility.summary}</p>
+          <div className='details-stack'>
             <div>
-              <p style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: 8 }}>
-                First birthdate
-              </p>
-              <BirthDateFields
-                namePrefix='first'
-                prefix='First birth'
-                value={firstValue}
-                onChange={(nextValue) => {
-                  setFirstValue(nextValue);
-                  setError('');
-                }}
-              />
+              <h4>Where you shine together</h4>
+              <p className='text-secondary'>{result.compatibility.strengths}</p>
             </div>
-
-            {/* VS divider */}
-            <div style={{ textAlign: 'center' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  background: 'var(--surface-glass)',
-                  border: '1px solid var(--surface-card-border)',
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                }}
-              >
-                VS
-              </span>
-            </div>
-
-            {/* Second person */}
             <div>
-              <p style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: 8 }}>
-                Second birthdate
-              </p>
-              <BirthDateFields
-                namePrefix='second'
-                prefix='Second birth'
-                value={secondValue}
-                onChange={(nextValue) => {
-                  setSecondValue(nextValue);
-                  setError('');
-                }}
-              />
+              <h4>Where you may see things differently</h4>
+              <p className='text-secondary'>{result.compatibility.tension}</p>
+            </div>
+            <div className='takeaway'>
+              <div>
+                <h4>Something to try together</h4>
+                <p>{result.compatibility.advice}</p>
+              </div>
             </div>
           </div>
-
-          <div className='spacer-lg' />
-
-          <button
-            className='primary-action-button'
-            disabled={loading}
-            type='button'
-            onClick={handleButtonClick}
-          >
-            {loading ? (
-              <span style={{ display: 'flex', gap: 6 }}>
-                <span className='cosmic-loader-dot' style={{ width: 8, height: 8 }} />
-                <span className='cosmic-loader-dot' style={{ width: 8, height: 8 }} />
-                <span className='cosmic-loader-dot' style={{ width: 8, height: 8 }} />
-              </span>
-            ) : (
-              <>
-                <MdCompareArrows size={20} />
-                <span>Compare</span>
-              </>
-            )}
-          </button>
-        </form>
-
-        {error && (
-          <p className='error-text' style={{ textAlign: 'center', marginTop: 12 }}>{error}</p>
-        )}
-
-        {/* Result */}
-        <AnimatePresence>
-          {result && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              style={{ marginTop: 32 }}
-            >
-              {/* VS Cards */}
-              <div className='compat-vs'>
-                <div className='glass-card' style={{ textAlign: 'center', padding: 16 }}>
-                  <p style={{ fontWeight: 600 }}>{displayDob(result.first.dob)}</p>
-                  <div style={{ marginTop: 8 }}>
-                    <ElementBadge
-                      name={
-                        result.first.dominant_elements[0]?.name ||
-                        result.first.core_numbers.spirit.element
-                      }
-                    />
-                  </div>
-                </div>
-                <div className='compat-vs-badge'>VS</div>
-                <div className='glass-card' style={{ textAlign: 'center', padding: 16 }}>
-                  <p style={{ fontWeight: 600 }}>{displayDob(result.second.dob)}</p>
-                  <div style={{ marginTop: 8 }}>
-                    <ElementBadge
-                      name={
-                        result.second.dominant_elements[0]?.name ||
-                        result.second.core_numbers.spirit.element
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Compatibility Details */}
-              <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div>
-                  <p style={{ fontWeight: 600, marginBottom: 4 }}>Summary</p>
-                  <p className='text-secondary text-sm'>{result.compatibility.summary}</p>
-                </div>
-                <div>
-                  <p style={{ fontWeight: 600, marginBottom: 4 }}>Strengths</p>
-                  <p className='text-secondary text-sm'>{result.compatibility.strengths}</p>
-                </div>
-                <div>
-                  <p style={{ fontWeight: 600, marginBottom: 4 }}>Tension points</p>
-                  <p className='text-secondary text-sm'>{result.compatibility.tension}</p>
-                </div>
-                <div className='callout'>
-                  <p style={{ fontWeight: 600, marginBottom: 4, fontSize: '0.875rem' }}>Advice</p>
-                  <p className='text-secondary text-sm'>{result.compatibility.advice}</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
+        </section>
+      )}
+    </div>
   );
 }

@@ -1,10 +1,5 @@
-import { useMemo } from 'react';
-import {
-  MdCheckCircle,
-  MdContentCopy,
-  MdDownload,
-  MdShare,
-} from 'react-icons/md';
+import { useEffect, useState } from 'react';
+import { MdContentCopy, MdDownload, MdShare } from 'react-icons/md';
 import {
   FaInstagram,
   FaThreads,
@@ -15,138 +10,124 @@ import {
 type ShareButtonsProps = {
   shareUrl: string;
   shareText: string;
-  elementName?: string;
-  copyStatus?: string;
-  onCopy: () => void;
   onDownload: () => void;
 };
-
 export default function ShareButtons({
   shareUrl,
   shareText,
-  elementName,
-  copyStatus,
-  onCopy,
   onDownload,
 }: ShareButtonsProps) {
-  const canNativeShare = useMemo(
-    () => typeof navigator !== 'undefined' && !!navigator.share,
-    [],
-  );
+  const [expanded, setExpanded] = useState(false);
+  const [canNativeShare, setCanNativeShare] = useState(false);
+  const [status, setStatus] = useState('');
+  const [showCopyFallback, setShowCopyFallback] = useState(false);
+  useEffect(() => {
+    setCanNativeShare(!!navigator.share);
+  }, []);
+  const text = encodeURIComponent(shareText);
+  const url = encodeURIComponent(shareUrl);
 
-  const encodedText = encodeURIComponent(shareText);
-  const encodedUrl = encodeURIComponent(shareUrl);
-
-  function handleWhatsApp() {
-    window.open(
-      `https://wa.me/?text=${encodedText}%0A${encodedUrl}`,
-      '_blank',
-      'noopener',
-    );
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setStatus('Link copied. Ready to share.');
+      setShowCopyFallback(false);
+    } catch {
+      setShowCopyFallback(true);
+      setStatus('Select and copy the link below.');
+    }
   }
-
-  function handleTwitter() {
-    window.open(
-      `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
-      '_blank',
-      'noopener',
-    );
-  }
-
-  function handleThreads() {
-    window.open(
-      `https://www.threads.net/intent/post?text=${encodedText}%20${encodedUrl}`,
-      '_blank',
-      'noopener',
-    );
-  }
-
-  function handleInstagram() {
-    // Instagram doesn't have a direct share URL — trigger download for story
-    onDownload();
-  }
-
-  async function handleNativeShare() {
+  async function nativeShare() {
     try {
       await navigator.share({
-        title: 'My BornDate Reading',
+        title: 'My BornDate reading',
         text: shareText,
         url: shareUrl,
       });
-    } catch (err) {
-      // User cancelled or share failed — ignore
+    } catch (error) {
+      if (!(error instanceof Error && error.name === 'AbortError'))
+        setStatus('Sharing is unavailable. Try copying the link instead.');
+    }
+  }
+  function download() {
+    try {
+      onDownload();
+      setStatus('Your card is ready. Check your downloads.');
+    } catch {
+      setStatus('We couldn’t create your card. Please try again.');
     }
   }
 
   return (
-    <div className='share-buttons'>
-      <button
-        className='share-btn share-btn--whatsapp'
-        onClick={handleWhatsApp}
-        title='Share to WhatsApp'
-      >
-        <FaWhatsapp size={16} />
-        WhatsApp
-      </button>
-      <button
-        className='share-btn share-btn--twitter'
-        onClick={handleTwitter}
-        title='Share to X / Twitter'
-      >
-        <FaXTwitter size={14} />
-        X
-      </button>
-      <button
-        className='share-btn share-btn--threads'
-        onClick={handleThreads}
-        title='Share to Threads'
-      >
-        <FaThreads size={14} />
-        Threads
-      </button>
-      <button
-        className='share-btn share-btn--instagram'
-        onClick={handleInstagram}
-        title='Share to Instagram (downloads card)'
-      >
-        <FaInstagram size={15} />
-        Story
-      </button>
-      <button
-        className='share-btn share-btn--copy'
-        onClick={onCopy}
-        title='Copy link'
-      >
-        {copyStatus ? (
-          <>
-            <MdCheckCircle size={15} />
-            Copied!
-          </>
-        ) : (
-          <>
-            <MdContentCopy size={15} />
-            Copy Link
-          </>
-        )}
-      </button>
-      <button
-        className='share-btn share-btn--download'
-        onClick={onDownload}
-        title='Download card'
-      >
-        <MdDownload size={16} />
-        Download
-      </button>
-      {canNativeShare && (
+    <section className='sharing-section' aria-label='Share your reading'>
+      <div className='reading-actions'>
         <button
-          className='share-btn share-btn--native'
-          onClick={handleNativeShare}
-          title='Share'
+          className='secondary-button'
+          onClick={() => setExpanded(!expanded)}
+          aria-expanded={expanded}
+          aria-controls='sharing-options'
         >
-          <MdShare size={16} />
-          More
+          <MdShare aria-hidden='true' /> Share reading
         </button>
+        <button className='text-button' onClick={download}>
+          <MdDownload aria-hidden='true' /> Download card
+        </button>
+      </div>
+      {expanded && (
+        <div id='sharing-options' className='share-panel fade-in'>
+          <p>Share a little of yourself.</p>
+          <div className='share-buttons'>
+            <a
+              className='share-btn'
+              href={`https://wa.me/?text=${text}%0A${url}`}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <FaWhatsapp aria-hidden='true' /> WhatsApp
+            </a>
+            <a
+              className='share-btn'
+              href={`https://twitter.com/intent/tweet?text=${text}&url=${url}`}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <FaXTwitter aria-hidden='true' /> X
+            </a>
+            <a
+              className='share-btn'
+              href={`https://www.threads.net/intent/post?text=${text}%20${url}`}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <FaThreads aria-hidden='true' /> Threads
+            </a>
+            <button className='share-btn' onClick={download}>
+              <FaInstagram aria-hidden='true' /> Download for Story
+            </button>
+            <button className='share-btn' onClick={copyLink}>
+              <MdContentCopy aria-hidden='true' /> Copy link
+            </button>
+            {canNativeShare && (
+              <button className='share-btn' onClick={nativeShare}>
+                <MdShare aria-hidden='true' /> More options
+              </button>
+            )}
+          </div>
+          {showCopyFallback && (
+            <label className='copy-fallback'>
+              Reading link
+              <input
+                readOnly
+                value={shareUrl}
+                onFocus={(event) => event.target.select()}
+              />
+            </label>
+          )}
+        </div>
       )}
-    </div>
+      <p className='status-text' role='status'>
+        {status}
+      </p>
+    </section>
   );
 }

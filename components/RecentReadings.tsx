@@ -1,67 +1,45 @@
 import { displayDob } from '@/lib/dob';
 import { SavedReading, deleteSavedReading } from '@/lib/storage';
-import { MdDeleteOutline } from 'react-icons/md';
 import ElementBadge from './ElementBadge';
+import { MdArrowForward, MdDeleteOutline } from 'react-icons/md';
 
-type RecentReadingsProps = {
+type Props = {
   readings: SavedReading[];
   onOpen: (dob: string) => void;
   onChange: (readings: SavedReading[]) => void;
 };
-
-export default function RecentReadings({ readings, onOpen, onChange }: RecentReadingsProps) {
-  if (readings.length === 0) return null;
-
+export default function RecentReadings({ readings, onOpen, onChange }: Props) {
   return (
-    <div className='section'>
-      <div className='section-header' style={{ textAlign: 'center' }}>
-        <h3 className='section-title'>Recent Readings</h3>
+    <section className='recent-section' aria-labelledby='recent-title'>
+      <div className='section-heading-row'>
+        <h2 id='recent-title'>Your recent readings</h2>
+        <span className='text-secondary text-sm'>Saved on this device</span>
       </div>
-      <div className='recent-scroll'>
-        {readings.map((reading) => (
-          <div
-            className='recent-card'
-            key={reading.dob}
-            onClick={() => onOpen(reading.dob)}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <p style={{ fontWeight: 600 }}>{displayDob(reading.dob)}</p>
+      <div className='recent-grid'>
+        {readings.map((reading, index) => (
+          <article className='recent-card' key={reading.dob}>
+            <div className='recent-meta'>
+              <ElementBadge name={reading.dominantElement} />
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onChange(deleteSavedReading(reading.dob));
-                }}
-                title='Remove reading'
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  background: 'transparent',
-                  color: 'var(--text-tertiary)',
-                  transition: 'color var(--transition-fast), background var(--transition-fast)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#ef4444';
-                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--text-tertiary)';
-                  e.currentTarget.style.background = 'transparent';
-                }}
+                className='icon-button'
+                aria-label={`Delete reading for ${displayDob(reading.dob)}`}
+                onClick={() => onChange(deleteSavedReading(reading.dob))}
               >
-                <MdDeleteOutline size={16} />
+                <MdDeleteOutline aria-hidden='true' />
               </button>
             </div>
-            <ElementBadge name={reading.dominantElement} />
-            <p className='text-secondary text-xs' style={{ marginTop: 8, lineHeight: 1.4 }}>
-              {reading.insight?.slice(0, 80)}{reading.insight && reading.insight.length > 80 ? '...' : ''}
-            </p>
-          </div>
+            <button className='recent-open' onClick={() => onOpen(reading.dob)}>
+              <span>
+                <small>
+                  {index === 0 ? 'Continue your last reading' : 'Open reading'}
+                </small>
+                <strong>{displayDob(reading.dob)}</strong>
+              </span>
+              <MdArrowForward aria-hidden='true' />
+            </button>
+          </article>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
